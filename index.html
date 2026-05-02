@@ -1,0 +1,1129 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1">
+<title>Oh!ダッシュボード</title>
+<style>
+:root{
+  --bg:#F7F7F5;--bg2:#EFEFEC;--bg3:#E4E4E0;
+  --text:#1A1A1A;--text2:#555;--text3:#999;
+  --border:#DDDDD8;--border2:#AAAAAA;
+  --sky:#1D9E75;--kifune:#EF9F27;
+  --radius:10px;--font:'Hiragino Sans','Noto Sans JP',sans-serif;
+}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+body{background:var(--bg);color:var(--text);font-family:var(--font);font-size:14px;min-height:100vh}
+.header{padding:16px 16px 10px;background:#fff;border-bottom:1px solid var(--border)}
+.header h1{font-size:18px;font-weight:700}
+.header p{font-size:12px;color:var(--text3);margin-top:2px}
+.tabbar{display:flex;overflow-x:auto;background:#fff;border-bottom:1px solid var(--border);-webkit-overflow-scrolling:touch;scrollbar-width:none}
+.tabbar::-webkit-scrollbar{display:none}
+.tab{flex-shrink:0;padding:11px 16px;font-size:13px;color:var(--text2);cursor:pointer;border-bottom:2px solid transparent;white-space:nowrap}
+.tab.active{color:var(--text);border-bottom-color:var(--text);font-weight:600}
+.subtabbar{display:flex;background:var(--bg2);border-bottom:1px solid var(--border);padding:0 8px}
+.subtab{flex-shrink:0;padding:8px 14px;font-size:12px;color:var(--text2);cursor:pointer;border-bottom:2px solid transparent;white-space:nowrap}
+.subtab.sky-on{color:var(--sky);border-bottom-color:var(--sky);font-weight:600}
+.subtab.kif-on{color:var(--kifune);border-bottom-color:var(--kifune);font-weight:600}
+.section{display:none}.section.active{display:block}
+.subsec{display:none}.subsec.active{display:block}
+.card{background:#fff;border-radius:var(--radius);border:1px solid var(--border);padding:14px;margin-bottom:12px}
+.card-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px}
+.card-title{font-size:14px;font-weight:600}
+.badge{font-size:11px;padding:2px 8px;border-radius:20px;font-weight:500}
+.bt{background:#E8F7F2;color:#1D9E75}.bk{background:#FEF6E8;color:#C17D10}
+.bp{background:#F0EFFF;color:#5A52CC}.bg{background:#E6F4EA;color:#2E7D32}
+.bw{background:var(--bg2);color:var(--text2)}.bi{background:#E8F0FE;color:#1565C0}
+.metrics{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:12px}
+.metric{background:#fff;border-radius:var(--radius);border:1px solid var(--border);padding:12px 10px;text-align:center}
+.metric-label{font-size:11px;color:var(--text3);margin-bottom:4px}
+.metric-val{font-size:22px;font-weight:700;line-height:1}
+.metric-sub{font-size:11px;color:var(--text3);margin-top:2px}
+.pbar{height:3px;background:var(--bg3);border-radius:2px;margin-top:6px}
+.pfill{height:100%;background:var(--sky);border-radius:2px}
+.pfill-k{background:var(--kifune)}
+.todo-list{display:flex;flex-direction:column;gap:6px;margin-bottom:10px}
+.todo-item{display:flex;align-items:center;gap:10px;padding:9px 10px;background:var(--bg);border-radius:8px}
+.chk{width:18px;height:18px;border-radius:50%;border:1.5px solid var(--border2);flex-shrink:0;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:10px}
+.chk.done{background:var(--text);border-color:var(--text);color:#fff}.chk.done::after{content:'✓'}
+.todo-text{flex:1;font-size:13px;color:var(--text);line-height:1.4}
+.todo-text.done{text-decoration:line-through;color:var(--text3)}
+.del-btn{font-size:18px;color:var(--text3);cursor:pointer;padding:0 2px;line-height:1}
+.add-row{display:flex;gap:6px;margin-top:8px}
+.add-row input{flex:1;font-size:13px;padding:9px 11px;border:1px solid var(--border);border-radius:8px;background:var(--bg2);color:var(--text);font-family:var(--font)}
+.add-row input:focus{outline:none;border-color:var(--border2)}
+.add-row button{font-size:13px;padding:9px 14px;border:1px solid var(--border2);border-radius:8px;background:var(--text);color:#fff;cursor:pointer;font-family:var(--font);white-space:nowrap}
+.add-row input[type="date"]{flex:0 0 auto;width:130px;font-size:12px}
+.todo-date{font-size:11px;color:var(--text3);white-space:nowrap;margin-right:2px}
+.gcal-btn{font-size:11px;padding:2px 7px;border-radius:12px;background:#E8F0FE;color:#1565C0;text-decoration:none;white-space:nowrap;flex-shrink:0}
+.gcal-open-btn{display:block;width:100%;text-align:center;padding:12px;background:#1A73E8;color:#fff;border-radius:var(--radius);font-size:14px;font-weight:600;text-decoration:none;margin-bottom:12px}
+.pipe-list{display:flex;flex-direction:column;gap:6px;margin-bottom:10px}
+.pipe-item{display:flex;align-items:center;gap:8px;padding:9px 10px;background:var(--bg);border-radius:8px}
+.pipe-stage{font-size:10px;padding:2px 7px;border-radius:20px;font-weight:600;white-space:nowrap}
+.s-idea{background:#E8F4FD;color:#1565C0}.s-shoot{background:#FFF3E0;color:#E65100}
+.s-edit{background:#F3E5F5;color:#7B1FA2}.s-done{background:#E8F5E9;color:#1B5E20}
+.pipe-title{flex:1;font-size:13px;color:var(--text)}
+.pipe-date{font-size:11px;color:var(--text3);white-space:nowrap}
+.pipe-del{font-size:18px;color:var(--text3);cursor:pointer}
+.pipe-form{display:flex;flex-direction:column;gap:6px;margin-top:8px;padding-top:10px;border-top:1px solid var(--border)}
+.pipe-form input,.pipe-form select{font-size:13px;padding:9px 11px;border:1px solid var(--border);border-radius:8px;background:var(--bg2);color:var(--text);font-family:var(--font);-webkit-appearance:none}
+.pipe-form .row{display:flex;gap:6px}.pipe-form .row>*{flex:1}
+.pipe-form button{font-size:13px;padding:10px;border:1px solid var(--border2);border-radius:8px;background:var(--text);color:#fff;cursor:pointer;font-family:var(--font)}
+.dot-list{display:flex;flex-direction:column;gap:6px;margin-bottom:10px}
+.dot-item{display:flex;align-items:flex-start;gap:8px;padding:8px 10px;background:var(--bg);border-radius:8px}
+.dot-circle{width:7px;height:7px;border-radius:50%;background:var(--border2);flex-shrink:0;margin-top:5px}
+/* Cal */
+.cal-nav{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px}
+.cal-nav-btn{font-size:20px;background:none;border:none;cursor:pointer;color:var(--text);padding:4px 8px}
+.cal-title{font-size:15px;font-weight:600}
+.cal-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:2px;margin-bottom:12px}
+.cal-head{text-align:center;font-size:11px;color:var(--text3);padding:4px 0}
+.cal-day{min-height:44px;padding:3px;border-radius:6px;border:1px solid transparent}
+.cal-day.today{background:var(--bg2);border-color:var(--border)}
+.cal-day.other{opacity:.35}
+.cal-num{font-size:11px;color:var(--text2);text-align:right;margin-bottom:2px}
+.cal-ev{font-size:9px;padding:1px 3px;border-radius:3px;margin-bottom:1px;overflow:hidden;white-space:nowrap;text-overflow:ellipsis}
+.ev-sky{background:#E8F7F2;color:#1D9E75}.ev-kifune{background:#FEF6E8;color:#C17D10}.ev-gcal{background:#E8F0FE;color:#1A73E8}
+.gcal-sync-btn{display:block;width:100%;font-size:13px;padding:9px;border:1px solid var(--border);border-radius:8px;background:var(--bg2);color:var(--text);cursor:pointer;margin-bottom:10px;font-family:var(--font);text-align:center}
+.ev-form{display:flex;flex-direction:column;gap:6px;margin-top:10px;padding-top:10px;border-top:1px solid var(--border)}
+.ev-form input,.ev-form select{font-size:13px;padding:9px 11px;border:1px solid var(--border);border-radius:8px;background:var(--bg2);color:var(--text);font-family:var(--font);-webkit-appearance:none}
+.ev-form .row{display:flex;gap:6px}.ev-form .row>*{flex:1}
+.ev-form button{font-size:13px;padding:10px;border:1px solid var(--border2);border-radius:8px;background:var(--text);color:#fff;cursor:pointer;font-family:var(--font)}
+.upcoming-list{display:flex;flex-direction:column;gap:6px;margin-top:8px}
+.upc-item{display:flex;align-items:center;gap:8px;padding:9px 10px;background:#fff;border-radius:8px;border:1px solid var(--border)}
+/* Remind */
+.remind-list{display:flex;flex-direction:column;gap:6px}
+.remind-item{display:flex;align-items:center;gap:10px;padding:10px;border:1px solid var(--border);border-radius:8px;background:#fff}
+.rdot{width:10px;height:10px;border-radius:50%;flex-shrink:0}
+.dot-sky{background:#1D9E75}.dot-kifune{background:#EF9F27}
+.remind-body{flex:1}.remind-title{font-size:13px}.remind-time{font-size:11px;color:var(--text3);margin-top:1px}
+.remind-del{font-size:20px;color:var(--text3);cursor:pointer}
+.remind-form{display:flex;flex-direction:column;gap:6px;margin-top:10px;padding-top:10px;border-top:1px solid var(--border)}
+.remind-form input,.remind-form select{font-size:13px;padding:9px 11px;border:1px solid var(--border);border-radius:8px;background:var(--bg2);color:var(--text);font-family:var(--font);-webkit-appearance:none}
+.remind-form .row{display:flex;gap:6px}.remind-form .row>*{flex:1}
+.remind-form button,.notif-btn{display:block;width:100%;font-size:13px;padding:11px;border:1px solid var(--border);border-radius:8px;background:var(--bg2);color:var(--text);cursor:pointer;text-align:center;margin-bottom:8px;font-family:var(--font)}
+/* AI Advisor */
+.ai-advisor{background:linear-gradient(135deg,#1a1a2e,#16213e);border-radius:var(--radius);padding:14px;margin-bottom:12px;border:1px solid #2a2a4a}
+.ai-adv-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px}
+.ai-adv-title{font-size:14px;font-weight:600;color:#fff}
+.ai-quick{display:flex;flex-wrap:wrap;gap:5px;margin-bottom:10px}
+.ai-qbtn{font-size:11px;padding:5px 10px;border:1px solid #444;border-radius:20px;background:#222;color:#ccc;cursor:pointer;font-family:var(--font);white-space:nowrap}
+.ai-qbtn:active{background:#333}
+.ai-msgs{display:flex;flex-direction:column;gap:8px;margin-bottom:10px}
+.ai-msg-user{align-self:flex-end;background:#2E6DB4;color:#fff;border-radius:12px 12px 2px 12px;padding:8px 12px;font-size:13px;max-width:85%;line-height:1.5;white-space:pre-wrap}
+.ai-msg-ai{align-self:flex-start;background:#2a2a2a;color:#e0e0e0;border-radius:12px 12px 12px 2px;padding:8px 12px;font-size:13px;max-width:90%;line-height:1.6;white-space:pre-wrap}
+.ai-msg-loading{color:#666;font-size:12px;font-style:italic;padding:4px 0;align-self:flex-start}
+.ai-inp-row{display:flex;gap:6px}
+.ai-inp-row input{flex:1;font-size:13px;padding:9px 11px;border:1px solid #444;border-radius:8px;background:#222;color:#eee;font-family:var(--font)}
+.ai-inp-row input:focus{outline:none;border-color:#666}
+.ai-inp-row input::placeholder{color:#555}
+.ai-inp-row button{font-size:13px;padding:9px 14px;border:none;border-radius:8px;background:#1a73e8;color:#fff;cursor:pointer;font-family:var(--font)}
+.ai-auto-row{display:flex;align-items:center;gap:6px;margin-bottom:10px;padding:8px 10px;background:#111;border-radius:8px;border:1px solid #333}
+.ai-auto-label{font-size:10px;color:#888;white-space:nowrap}
+.ai-auto-inp{flex:1;font-size:12px;padding:5px 8px;border:1px solid #444;border-radius:6px;background:#1a1a1a;color:#ccc;font-family:var(--font)}
+.ai-auto-inp:focus{outline:none;border-color:#666}
+.ai-auto-save{font-size:11px;padding:5px 10px;border:1px solid #555;border-radius:6px;background:#222;color:#aaa;cursor:pointer;white-space:nowrap;font-family:var(--font)}
+/* カレンダーバー */
+.cal-bar{position:fixed;bottom:0;left:0;right:0;background:#fff;border-top:1px solid var(--border);padding:8px 14px;z-index:100;display:flex;align-items:center;gap:10px;box-shadow:0 -2px 8px rgba(0,0,0,.06)}
+.cal-bar-date{font-size:12px;font-weight:700;color:var(--text);white-space:nowrap}
+.cal-bar-events{flex:1;overflow:hidden;display:flex;gap:6px;align-items:center}
+.cal-bar-ev{font-size:11px;color:var(--text2);white-space:nowrap;padding:2px 7px;border-radius:10px}
+.cal-bar-none{font-size:11px;color:var(--text3);font-style:italic}
+.main{padding:12px;max-width:640px;margin:0 auto;padding-bottom:56px}
+/* 音声モーダル */
+.modal-overlay{position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,.45);z-index:200;display:flex;align-items:flex-end;justify-content:center}
+.modal-box{background:#fff;border-radius:16px 16px 0 0;padding:20px 16px 32px;width:100%;max-width:640px;max-height:85vh;overflow-y:auto}
+.modal-head{font-size:16px;font-weight:700;margin-bottom:14px;display:flex;justify-content:space-between;align-items:center}
+.modal-close{font-size:26px;color:var(--text3);cursor:pointer;line-height:1;background:none;border:none;font-family:var(--font)}
+/* GS */
+.gs-url-inp{width:100%;font-size:13px;padding:10px 11px;border:1px solid var(--border);border-radius:8px;background:var(--bg2);color:var(--text);font-family:var(--font);margin-bottom:8px}
+.gs-status{font-size:12px;color:var(--text2);margin-bottom:12px}.gs-ok{color:#27500A}
+.sync-btn{display:block;width:100%;font-size:13px;padding:11px;border:1px solid var(--border);border-radius:8px;background:var(--bg2);color:var(--text);cursor:pointer;text-align:left;margin-bottom:7px;font-family:var(--font)}
+.sync-log{font-size:11px;color:var(--text2);line-height:2;min-height:50px}
+.desc{font-size:12px;color:var(--text2);line-height:1.6;margin-bottom:10px}
+.info-box{background:var(--bg2);border-radius:8px;padding:11px;font-size:12px;color:var(--text2);line-height:1.7;margin-bottom:10px}
+/* ホーム */
+.home-greeting{font-size:18px;font-weight:700;margin-bottom:2px}
+.home-sub{font-size:12px;color:var(--text3)}
+.home-row{display:flex;align-items:center;gap:8px;padding:8px 0;border-bottom:1px solid var(--border)}
+.home-row:last-child{border-bottom:none}
+.home-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
+.home-label{font-size:12px;color:var(--text3);white-space:nowrap;margin-right:4px}
+.home-val{font-size:13px;color:var(--text);flex:1}
+.home-empty{font-size:12px;color:var(--text3);font-style:italic;padding:6px 0}
+.review-sec{margin-bottom:10px}
+.review-sec-title{font-size:12px;font-weight:600;color:var(--text2);margin-bottom:6px;padding-bottom:4px;border-bottom:1px solid var(--border)}
+.review-done{display:flex;align-items:center;gap:8px;padding:5px 0;font-size:13px;color:var(--text3);text-decoration:line-through}
+.review-pending{display:flex;align-items:center;gap:8px;padding:5px 0;font-size:13px;color:var(--text)}
+.stat-row{display:flex;justify-content:space-between;align-items:center;padding:6px 0;border-bottom:1px solid var(--border);font-size:13px}
+.stat-row:last-child{border-bottom:none}
+.stat-num{font-weight:700;color:var(--kifune)}
+/* アイデア */
+.idea-item{display:flex;align-items:center;gap:8px;padding:8px 10px;background:var(--bg);border-radius:8px;margin-bottom:5px}
+.idea-text{flex:1;font-size:13px}
+.idea-to-pipe{font-size:11px;padding:3px 8px;border:1px solid var(--sky);border-radius:12px;color:var(--sky);background:#fff;cursor:pointer;white-space:nowrap;font-family:var(--font)}
+/* 音声メモ */
+.mic-btn{display:flex;flex-direction:column;align-items:center;justify-content:center;width:100%;padding:28px 16px;font-size:18px;border:3px solid var(--kifune);border-radius:16px;background:linear-gradient(135deg,#fff8ee,#fff);color:var(--kifune);cursor:pointer;margin-bottom:14px;font-family:var(--font);font-weight:700;text-align:center;gap:6px;box-shadow:0 2px 12px rgba(239,159,39,.15)}
+.mic-btn .mic-icon{font-size:44px;line-height:1}
+.mic-btn .mic-label{font-size:15px}
+.mic-btn .mic-hint{font-size:11px;color:var(--text3);font-weight:400}
+.mic-btn.recording{background:linear-gradient(135deg,#fff0f0,#fff);border-color:#e53935;color:#e53935;box-shadow:0 2px 16px rgba(229,57,53,.25);animation:pulse 1s infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.7}}
+.order-form{display:flex;flex-direction:column;gap:6px}
+.order-form input{font-size:13px;padding:9px 11px;border:1px solid var(--border);border-radius:8px;background:var(--bg2);color:var(--text);font-family:var(--font)}
+.order-form .row{display:flex;gap:6px}.order-form .row>*{flex:1}
+.order-form button{font-size:13px;padding:10px;border:1px solid var(--border2);border-radius:8px;background:var(--text);color:#fff;cursor:pointer;font-family:var(--font);margin-top:4px}
+.order-card{background:#fff;border-radius:var(--radius);border:1px solid var(--border);padding:12px;margin-bottom:8px}
+.order-top{display:flex;align-items:center;gap:8px;margin-bottom:6px}
+.order-customer{font-size:15px;font-weight:600;flex:1;color:var(--text)}
+.order-meta{font-size:12px;color:var(--text2);line-height:2}
+.order-meta span{display:inline-block;margin-right:12px}
+.order-note-text{font-size:11px;color:var(--text3);margin-top:4px;line-height:1.5}
+.done-btn{font-size:12px;padding:5px 12px;border:1px solid var(--border2);border-radius:20px;background:var(--bg2);color:var(--text2);cursor:pointer;font-family:var(--font);white-space:nowrap}
+.order-edit-btn{font-size:11px;padding:4px 9px;border:1px solid var(--border);border-radius:20px;background:var(--bg2);color:var(--text2);cursor:pointer;font-family:var(--font);white-space:nowrap}
+.order-alert{border-color:#e53935!important}.order-alert .order-delivery-warn{color:#e53935;font-weight:700}
+.order-edit-form{display:flex;flex-direction:column;gap:5px;margin-top:4px}
+.order-edit-form input{font-size:12px;padding:7px 9px;border:1px solid var(--border);border-radius:7px;background:var(--bg2);color:var(--text);font-family:var(--font)}
+.order-edit-form .row{display:flex;gap:5px}.order-edit-form .row>*{flex:1}
+.order-edit-btns{display:flex;gap:6px;margin-top:2px}
+.order-edit-btns button{flex:1;font-size:12px;padding:7px;border-radius:7px;cursor:pointer;font-family:var(--font);border:none}
+.ai-reset-btn{font-size:11px;padding:3px 9px;border:1px solid #555;border-radius:12px;background:transparent;color:#aaa;cursor:pointer;font-family:var(--font)}
+</style>
+</head>
+<body>
+<div class="header">
+  <h1>Oh!ダッシュボード</h1>
+  <p id="today-label"></p>
+</div>
+<div class="tabbar">
+  <div class="tab active" onclick="switchTab('home')">ホーム</div>
+  <div class="tab" onclick="switchTab('kifune')">キフネ</div>
+  <div class="tab" onclick="switchTab('sky')">SkyStage</div>
+  <div class="tab" onclick="switchTab('cal')">カレンダー</div>
+  <div class="tab" onclick="switchTab('remind')">リマインダー</div>
+  <div class="tab" onclick="switchTab('gs')">シート連携</div>
+</div>
+
+<!-- ===== ホーム ===== -->
+<div id="sec-home" class="section active">
+  <div class="main">
+    <div class="card">
+      <div class="home-greeting" id="home-greeting"></div>
+      <div class="home-sub" id="home-date"></div>
+    </div>
+    <button class="mic-btn" id="home-voice-btn" onclick="startHomeVoice()" style="border-color:var(--kifune);margin-bottom:12px">
+      <span class="mic-icon">🎤</span>
+      <span class="mic-label">音声メモを録音する</span>
+      <span class="mic-hint">お客様名 → 商品名 → 個数 の順に話してください</span>
+    </button>
+    <div class="card">
+      <div class="card-head"><span class="card-title">今日の予定</span></div>
+      <div id="home-events"></div>
+    </div>
+    <div class="card">
+      <div class="card-head"><span class="card-title">キフネ TODO</span><span class="badge bk" id="home-kifune-badge"></span></div>
+      <div id="home-kifune-todos"></div>
+    </div>
+    <div class="card">
+      <div class="card-head"><span class="card-title">未処理</span><span class="badge bk" id="home-orders-badge"></span></div>
+      <div id="home-orders"></div>
+    </div>
+    <div class="card">
+      <div class="card-head"><span class="card-title">SkyStage TODO</span><span class="badge bt" id="home-sky-badge"></span></div>
+      <div id="home-sky-todos"></div>
+    </div>
+    <div class="card">
+      <div class="card-head"><span class="card-title">週次レビュー</span></div>
+      <div id="home-review"></div>
+    </div>
+  </div>
+</div>
+
+<!-- ===== SkyStage ===== -->
+<div id="sec-sky" class="section">
+  <div class="subtabbar" id="sky-sub-bar">
+    <div class="subtab sky-on" onclick="switchSub('sky','main')">動画・配信</div>
+    <div class="subtab" onclick="switchSub('sky','mkt')">マーケ・調査</div>
+  </div>
+  <div class="main">
+    <div id="sky-sub-main" class="subsec active">
+      <div class="ai-advisor">
+        <div class="ai-adv-head"><span class="ai-adv-title">🤖 AIアドバイザー</span><div style="display:flex;gap:8px;align-items:center"><button class="ai-reset-btn" onclick="resetAdvisor('sky')">🔄 リセット</button><span style="font-size:10px;color:#4a8af4">Gemini</span></div></div>
+        <div class="ai-quick">
+          <button class="ai-qbtn" onclick="askAdvisor('sky','今日の予定と優先タスクを確認してアドバイスして')">今日の予定</button>
+          <button class="ai-qbtn" onclick="askAdvisor('sky','チャンネルの現状を踏まえた改善提案を3つして')">改善提案</button>
+          <button class="ai-qbtn" onclick="askAdvisor('sky','バイク・マラソン・祭りジャンルの注目トレンドを教えて')">トレンド</button>
+          <button class="ai-qbtn" onclick="askAdvisor('sky','今週の最重要タスクを1つ選んで理由を教えて')">今週の優先事項</button>
+        </div>
+        <div class="ai-auto-row">
+          <span class="ai-auto-label">⚙ 自動アドバイス文:</span>
+          <input id="ai-sky-auto-inp" class="ai-auto-inp">
+          <button class="ai-auto-save" onclick="saveAutoPrompt('sky')">保存</button>
+        </div>
+        <div class="ai-msgs" id="ai-sky-msgs"></div>
+        <div class="ai-inp-row"><input id="ai-sky-inp" placeholder="相談・質問を入力..." onkeydown="if(event.key==='Enter')askAdvisor('sky')"><button onclick="askAdvisor('sky')">送信</button></div>
+      </div>
+      <div class="metrics" id="sky-metrics"></div>
+      <div class="card">
+        <div class="card-head"><span class="card-title">アイデアクイックメモ</span><span class="badge bt" id="idea-badge">0件</span></div>
+        <div id="idea-list"></div>
+        <button class="mic-btn" id="idea-voice-btn" onclick="startIdeaVoice()" style="border-color:var(--sky);color:var(--sky);margin-bottom:8px;padding:10px;font-size:14px">🎤 音声でアイデア記録</button>
+        <div class="add-row"><input id="idea-inp" placeholder="動画アイデアを入力..."><button onclick="addIdea()">追加</button></div>
+      </div>
+      <div class="card">
+        <div class="card-head"><span class="card-title">今週のTODO</span><span class="badge bt" id="sky-todo-badge">0件残</span></div>
+        <div class="todo-list" id="sky-todo-list"></div>
+        <div class="add-row"><input id="sky-todo-inp" placeholder="タスクを追加..."><input type="date" id="sky-todo-date"><button onclick="addTodo('sky')">追加</button></div>
+      </div>
+      <div class="card">
+        <div class="card-head"><span class="card-title">動画パイプライン</span><span class="badge bw" id="pipe-badge">0本</span></div>
+        <div class="pipe-list" id="pipe-list"></div>
+        <div class="pipe-form">
+          <input id="pipe-title-inp" placeholder="動画タイトル...">
+          <div class="row">
+            <select id="pipe-stage-inp"><option value="s-idea">企画中</option><option value="s-shoot">撮影待ち</option><option value="s-edit">編集中</option><option value="s-done">完成</option></select>
+            <input id="pipe-date-inp" placeholder="〆切...">
+          </div>
+          <button onclick="addPipe()">パイプラインに追加</button>
+        </div>
+      </div>
+    </div>
+    <div id="sky-sub-mkt" class="subsec">
+      <div class="ai-advisor">
+        <div class="ai-adv-head"><span class="ai-adv-title">🤖 AIアドバイザー</span><div style="display:flex;gap:8px;align-items:center"><button class="ai-reset-btn" onclick="resetAdvisor('mkt')">🔄 リセット</button><span style="font-size:10px;color:#4a8af4">Gemini</span></div></div>
+        <div class="ai-quick">
+          <button class="ai-qbtn" onclick="askAdvisor('mkt','バイク・マラソン・祭りジャンルの最新トレンドを教えて')">トレンド</button>
+          <button class="ai-qbtn" onclick="askAdvisor('mkt','チャンネル成長のためのマーケ施策を提案して')">施策提案</button>
+          <button class="ai-qbtn" onclick="askAdvisor('mkt','競合チャンネルとの差別化ポイントをアドバイスして')">差別化</button>
+          <button class="ai-qbtn" onclick="askAdvisor('mkt','視聴者が求めるコンテンツのリサーチ方法を教えて')">調査方法</button>
+        </div>
+        <div class="ai-msgs" id="ai-mkt-msgs"></div>
+        <div class="ai-inp-row"><input id="ai-mkt-inp" placeholder="マーケ・調査について質問..." onkeydown="if(event.key==='Enter')askAdvisor('mkt')"><button onclick="askAdvisor('mkt')">送信</button></div>
+      </div>
+      <div class="card">
+        <div class="card-head"><span class="card-title">施策TODO</span><span class="badge bp" id="mkt-todo-badge">0件残</span></div>
+        <div class="todo-list" id="mkt-todo-list"></div>
+        <div class="add-row"><input id="mkt-todo-inp" placeholder="施策タスクを追加..."><button onclick="addSubTodo('mkt')">追加</button></div>
+      </div>
+      <div class="card">
+        <div class="card-head"><span class="card-title">施策アイデアストック</span><span class="badge bp" id="mkt-idea-badge">0件</span></div>
+        <div class="dot-list" id="mkt-idea-list"></div>
+        <div class="add-row"><input id="mkt-idea-inp" placeholder="アイデアを追加..."><button onclick="addMktIdea()">追加</button></div>
+      </div>
+      <div class="card">
+        <div class="card-head"><span class="card-title">調査TODO</span><span class="badge bi" id="research-todo-badge">0件残</span></div>
+        <div class="todo-list" id="research-todo-list"></div>
+        <div class="add-row"><input id="research-todo-inp" placeholder="調査タスクを追加..."><button onclick="addSubTodo('research')">追加</button></div>
+      </div>
+      <div class="card">
+        <div class="card-head"><span class="card-title">調査メモ・発見</span><span class="badge bi" id="research-note-badge">0件</span></div>
+        <div class="dot-list" id="research-note-list"></div>
+        <div class="add-row"><input id="research-note-inp" placeholder="気づきをメモ..."><button onclick="addNote()">追加</button></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ===== キフネ ===== -->
+<div id="sec-kifune" class="section">
+  <div class="subtabbar" id="kifune-sub-bar">
+    <div class="subtab kif-on" onclick="switchSub('kifune','ops')">日常業務</div>
+    <div class="subtab" onclick="switchSub('kifune','strategy')">営業部長モード</div>
+  </div>
+  <div class="main">
+    <div id="kifune-sub-ops" class="subsec active">
+      <div class="ai-advisor">
+        <div class="ai-adv-head"><span class="ai-adv-title">🤖 AIアドバイザー</span><div style="display:flex;gap:8px;align-items:center"><button class="ai-reset-btn" onclick="resetAdvisor('kifune')">🔄 リセット</button><span style="font-size:10px;color:#4a8af4">Gemini</span></div></div>
+        <div class="ai-quick">
+          <button class="ai-qbtn" onclick="askAdvisor('kifune','今日の予定と優先タスクを確認してアドバイスして')">今日の予定</button>
+          <button class="ai-qbtn" onclick="askAdvisor('kifune','業務の現状を踏まえた改善提案を3つして')">改善提案</button>
+          <button class="ai-qbtn" onclick="askAdvisor('kifune','営業・ビジネスの注目トレンドを教えて')">トレンド</button>
+          <button class="ai-qbtn" onclick="askAdvisor('kifune','受注状況と今週のTODOを踏まえた優先アクションは？')">今週の優先事項</button>
+        </div>
+        <div class="ai-auto-row">
+          <span class="ai-auto-label">⚙ 自動アドバイス文:</span>
+          <input id="ai-kifune-auto-inp" class="ai-auto-inp">
+          <button class="ai-auto-save" onclick="saveAutoPrompt('kifune')">保存</button>
+        </div>
+        <div class="ai-msgs" id="ai-kifune-msgs"></div>
+        <div class="ai-inp-row"><input id="ai-kifune-inp" placeholder="相談・質問を入力..." onkeydown="if(event.key==='Enter')askAdvisor('kifune')"><button onclick="askAdvisor('kifune')">送信</button></div>
+      </div>
+      <div class="metrics" id="kifune-metrics"></div>
+      <div class="card">
+        <div class="card-head"><span class="card-title">キフネTODO</span><span class="badge bk" id="kifune-todo-badge">0件残</span></div>
+        <div class="todo-list" id="kifune-todo-list"></div>
+        <div class="add-row"><input id="kifune-todo-inp" placeholder="業務タスクを追加..."><input type="date" id="kifune-todo-date"><button onclick="addTodo('kifune')">追加</button></div>
+      </div>
+      <div class="card">
+        <div class="card-head"><span class="card-title">今月の目標</span><span class="badge bg">進行中</span></div>
+        <div class="todo-list" id="kifune-goal-list"></div>
+        <div class="add-row"><input id="kifune-goal-inp" placeholder="目標を追加..."><button onclick="addGoal()">追加</button></div>
+      </div>
+      <div class="card">
+        <div class="card-head"><span class="card-title">今月の受注集計</span><span class="badge bk" id="order-stats-month"></span></div>
+        <div id="order-stats-list"></div>
+      </div>
+      <div class="card" id="recent-orders-card">
+        <div class="card-head"><span class="card-title">最近の音声メモ</span><span class="badge bk" style="cursor:pointer" onclick="switchSub('kifune','order')">全件を見る →</span></div>
+        <div id="recent-order-list"></div>
+      </div>
+    </div>
+    <div id="kifune-sub-strategy" class="subsec">
+      <div class="ai-advisor">
+        <div class="ai-adv-head"><span class="ai-adv-title">🤖 AIアドバイザー</span><div style="display:flex;gap:8px;align-items:center"><button class="ai-reset-btn" onclick="resetAdvisor('strategy')">🔄 リセット</button><span style="font-size:10px;color:#4a8af4">Gemini</span></div></div>
+        <div class="ai-quick">
+          <button class="ai-qbtn" onclick="askAdvisor('strategy','チームの現状を踏まえた組織改善提案をして')">組織改善</button>
+          <button class="ai-qbtn" onclick="askAdvisor('strategy','営業部長として今月注力すべき戦略的アクションを教えて')">今月の戦略</button>
+          <button class="ai-qbtn" onclick="askAdvisor('strategy','部下のモチベーション管理や育成についてアドバイスして')">人材育成</button>
+          <button class="ai-qbtn" onclick="askAdvisor('strategy','売上・受注トレンドを踏まえた中期的な施策を提案して')">中期施策</button>
+        </div>
+        <div class="ai-msgs" id="ai-strategy-msgs"></div>
+        <div class="ai-inp-row"><input id="ai-strategy-inp" placeholder="戦略・組織について質問..." onkeydown="if(event.key==='Enter')askAdvisor('strategy')"><button onclick="askAdvisor('strategy')">送信</button></div>
+      </div>
+      <div class="card">
+        <div class="card-head"><span class="card-title">戦略・気づきメモ</span><span class="badge bk">営業部長目線</span></div>
+        <div class="dot-list" id="strategy-list"></div>
+        <div class="add-row"><input id="strategy-inp" placeholder="戦略・気づきをメモ..."><button onclick="addStrategy()">追加</button></div>
+      </div>
+      <div class="card">
+        <div class="card-head"><span class="card-title">組織・チームTODO</span><span class="badge bk" id="org-todo-badge">0件残</span></div>
+        <div class="todo-list" id="org-todo-list"></div>
+        <div class="add-row"><input id="org-todo-inp" placeholder="組織・部下へのアクション..."><button onclick="addOrgTodo()">追加</button></div>
+      </div>
+    </div>
+    <div id="kifune-sub-ops-placeholder" style="display:none"></div>
+  </div>
+</div>
+
+<!-- ===== 音声メモ モーダル ===== -->
+<div id="voice-modal" class="modal-overlay" style="display:none" onclick="if(event.target===this)closeVoiceModal()">
+  <div class="modal-box">
+    <div class="modal-head">
+      <span>音声メモを保存</span>
+      <button class="modal-close" onclick="closeVoiceModal()">×</button>
+    </div>
+    <div class="order-form">
+      <input id="order-customer" placeholder="ユーザー・お客様名" list="dl-customers">
+      <datalist id="dl-customers"></datalist>
+      <div class="row">
+        <input id="order-staff" placeholder="担当者">
+        <input id="order-delivery" placeholder="希望納期">
+      </div>
+      <input id="order-product" placeholder="商品名" list="dl-products">
+      <datalist id="dl-products"></datalist>
+      <input id="order-qty" placeholder="個数・数量">
+      <input id="order-note" placeholder="メモ・補足">
+      <button onclick="addOrder();closeVoiceModal()">保存</button>
+    </div>
+  </div>
+</div>
+
+<!-- ===== カレンダーバー ===== -->
+<div class="cal-bar" id="cal-bar">
+  <span class="cal-bar-date" id="cal-bar-date"></span>
+  <div class="cal-bar-events" id="cal-bar-events"></div>
+</div>
+
+<!-- ===== カレンダー ===== -->
+<div id="sec-cal" class="section">
+  <div class="main">
+    <div class="card">
+      <div class="cal-nav">
+        <button class="cal-nav-btn" onclick="changeMonth(-1)">‹</button>
+        <span class="cal-title" id="cal-title"></span>
+        <button class="cal-nav-btn" onclick="changeMonth(1)">›</button>
+      </div>
+      <button class="gcal-sync-btn" id="gcal-btn" onclick="syncGCal()">Googleカレンダーと同期する ↻</button>
+      <div class="cal-grid" id="cal-grid"></div>
+      <div class="ev-form">
+        <input id="ev-title-inp" placeholder="予定・イベント名...">
+        <div class="row">
+          <input type="date" id="ev-date-inp">
+          <select id="ev-sec-inp"><option value="sky">SkyStage</option><option value="kifune">キフネ</option></select>
+        </div>
+        <button onclick="addEvent()">予定を追加</button>
+      </div>
+    </div>
+    <a class="gcal-open-btn" href="https://calendar.google.com" target="_blank">Googleカレンダーを開く →</a>
+    <div style="font-size:12px;color:var(--text3);margin:4px 0 6px">今後の予定</div>
+    <div class="upcoming-list" id="upcoming-list"></div>
+  </div>
+</div>
+
+<!-- ===== リマインダー ===== -->
+<div id="sec-remind" class="section">
+  <div class="main">
+    <div class="metrics">
+      <div class="metric"><div class="metric-label">設定済み</div><div class="metric-val" id="remind-count">0</div><div class="metric-sub">件</div></div>
+      <div class="metric"><div class="metric-label">通知許可</div><div class="metric-val" style="font-size:13px;padding-top:5px" id="notif-perm">未確認</div></div>
+    </div>
+    <div class="card">
+      <div class="card-head"><span class="card-title">リマインダー一覧</span><span class="badge bw" id="remind-badge">0件</span></div>
+      <div class="remind-list" id="remind-list"></div>
+      <div class="remind-form">
+        <input id="remind-title-inp" placeholder="リマインダー内容...">
+        <div class="row">
+          <input type="time" id="remind-time-inp" value="09:00">
+          <select id="remind-sec-inp"><option value="sky">SkyStage</option><option value="kifune">キフネ</option></select>
+        </div>
+        <button onclick="addReminder()">追加</button>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-head"><span class="card-title">通知設定</span></div>
+      <div class="desc">ブラウザの通知許可をオンにすると、設定した時刻にリマインダーが届きます。</div>
+      <button class="notif-btn" onclick="requestNotif()">通知を許可する</button>
+      <button class="notif-btn" onclick="testNotif()">テスト通知を送る</button>
+    </div>
+  </div>
+</div>
+
+<!-- ===== シート連携 ===== -->
+<div id="sec-gs" class="section">
+  <div class="main">
+    <div class="card">
+      <div class="card-head"><span class="card-title">Gemini APIキー</span><span class="badge bg">AIアドバイザー・無料</span></div>
+      <input class="gs-url-inp" id="gemini-key-inp" type="password" placeholder="AIzaSy...">
+      <button class="notif-btn" style="margin-bottom:8px" onclick="saveGeminiKey()">APIキーを保存</button>
+      <div class="gs-status" id="gemini-key-status">未設定</div>
+      <div class="desc" style="margin-top:4px">aistudio.google.com で無料取得できます。カード登録不要。</div>
+    </div>
+    <div class="info-box">Apps ScriptのURLを設定すると、データをGoogleスプレッドシートに送受信してマルチデバイス対応できます。</div>
+    <div class="card">
+      <div class="card-head"><span class="card-title">Apps Script URL</span><span class="badge bg">シート連携</span></div>
+      <input class="gs-url-inp" id="gs-url-inp" placeholder="https://script.google.com/macros/s/.../exec">
+      <button class="notif-btn" style="margin-bottom:8px" onclick="saveGsUrl()">URLを保存</button>
+      <div class="gs-status" id="gs-status">URLが未設定です</div>
+    </div>
+    <div class="card">
+      <div class="card-head"><span class="card-title">Googleカレンダー連携</span></div>
+      <input class="gs-url-inp" id="gcal-id-inp" placeholder="primary または xxx@gmail.com">
+      <button class="notif-btn" style="margin-bottom:8px" onclick="saveGCalId()">カレンダーIDを保存</button>
+      <div class="gs-status" id="gcal-status">未設定</div>
+    </div>
+    <div class="card">
+      <div class="card-head"><span class="card-title">データを受信</span></div>
+      <button class="sync-btn" style="color:#27500A;border-color:#4caf50" onclick="loadFromSheet()">← シートからデータを読み込む</button>
+      <label style="font-size:12px;color:var(--text2);display:flex;align-items:center;gap:8px;cursor:pointer">
+        <input type="checkbox" id="auto-load-chk" onchange="toggleAutoLoad()" style="width:16px;height:16px">
+        起動時に自動読み込みする
+      </label>
+    </div>
+    <div class="card">
+      <div class="card-head"><span class="card-title">データを送信</span></div>
+      <button class="sync-btn" onclick="syncToSheet('all')">全データを一括送信 →</button>
+      <button class="sync-btn" onclick="syncToSheet('todos')">TODOのみ送信 →</button>
+    </div>
+    <div class="card">
+      <div class="card-head"><span class="card-title">送信ログ</span></div>
+      <div class="sync-log" id="sync-log"><span style="color:var(--text3);font-style:italic">ログがここに表示されます</span></div>
+    </div>
+  </div>
+</div>
+
+<script>
+const KEY='sanbo_v1';
+const now=new Date();
+document.getElementById('today-label').textContent=now.getFullYear()+'年'+(now.getMonth()+1)+'月'+now.getDate()+'日（'+['日','月','火','水','木','金','土'][now.getDay()]+'）';
+
+// ===== State =====
+const def={
+  sky:{todos:[{text:'サムネイル作成（祭りライド）',done:false},{text:'概要欄テンプレ更新',done:false},{text:'ライブ配信の告知投稿',done:true}],
+    pipes:[{title:'夏祭り密着ライド2026',stage:'s-edit',date:'〆5/10'},{title:'マラソン大会レポート',stage:'s-shoot',date:'〆5/20'},{title:'バイクメンテ初心者ガイド',stage:'s-idea',date:'未定'}],
+    videoIdeas:[]},
+  kifune:{todos:[{text:'週報作成',done:false},{text:'会議資料の準備',done:false}],goals:[{text:'SkyStageと本業のバランスを整える',done:false}]},
+  mkt:{todos:[{text:'Xでの動画告知投稿',done:false}],ideas:[{text:'地元バイクコミュニティへの告知'},{text:'マラソン大会公式への協力依頼'}]},
+  research:{todos:[{text:'競合チャンネル3本分析',done:false}],notes:[{text:'祭り系は夏に再生数が伸びやすい'}]},
+  org:{todos:[],strategies:[]},
+  events:[{title:'夏祭りライド撮影',date:'2026-05-10',sec:'sky'},{title:'マラソン大会参加',date:'2026-05-18',sec:'sky'},{title:'月次レポート提出',date:'2026-05-30',sec:'kifune'}],
+  gcalEvents:[],
+  reminders:[{title:'動画編集チェック',time:'09:00',sec:'sky'},{title:'SNS投稿タイム',time:'12:00',sec:'sky'}],
+  orders:[],
+  knownCustomers:[],knownProducts:[],
+  gsUrl:'',gcalId:'',autoLoad:false
+};
+let state;
+function load(){try{const r=localStorage.getItem(KEY);state=r?JSON.parse(r):JSON.parse(JSON.stringify(def));}catch(e){state=JSON.parse(JSON.stringify(def));}}
+function save(){try{localStorage.setItem(KEY,JSON.stringify(state));}catch(e){}}
+
+const stageLabel={'s-idea':'企画中','s-shoot':'撮影待ち','s-edit':'編集中','s-done':'完成'};
+const secLabel={sky:'SkyStage',kifune:'キフネ',mkt:'マーケ',research:'市場調査',strategy:'営業部長'};
+const secColorClass={sky:'ev-sky',kifune:'ev-kifune',gcal:'ev-gcal'};
+
+// ===== Render =====
+function renderSky(){
+  const todos=state.sky.todos;
+  const pct=todos.length?Math.round(todos.filter(t=>t.done).length/todos.length*100):0;
+  document.getElementById('sky-todo-badge').textContent=todos.filter(t=>!t.done).length+'件残';
+  document.getElementById('sky-metrics').innerHTML=`<div class="metric"><div class="metric-label">TODO完了率</div><div class="metric-val">${pct}%</div><div class="pbar"><div class="pfill" style="width:${pct}%"></div></div></div><div class="metric"><div class="metric-label">企画ストック</div><div class="metric-val">${state.sky.pipes.filter(p=>p.stage==='s-idea').length}</div><div class="metric-sub">本</div></div><div class="metric"><div class="metric-label">編集中</div><div class="metric-val">${state.sky.pipes.filter(p=>p.stage==='s-edit').length}</div><div class="metric-sub">本</div></div>`;
+  renderTodos('sky-todo-list',todos,'sky','todos');renderPipes();
+}
+function renderKifune(){
+  const todos=state.kifune.todos;const goals=state.kifune.goals;
+  const pct=todos.length?Math.round(todos.filter(t=>t.done).length/todos.length*100):0;
+  document.getElementById('kifune-todo-badge').textContent=todos.filter(t=>!t.done).length+'件残';
+  document.getElementById('kifune-metrics').innerHTML=`<div class="metric"><div class="metric-label">TODO完了率</div><div class="metric-val">${pct}%</div><div class="pbar"><div class="pfill pfill-k" style="width:${pct}%"></div></div></div><div class="metric"><div class="metric-label">今月目標</div><div class="metric-val">${goals.length}</div><div class="metric-sub">件</div></div><div class="metric"><div class="metric-label">達成済み</div><div class="metric-val">${goals.filter(g=>g.done).length}</div><div class="metric-sub">件</div></div>`;
+  renderTodos('kifune-todo-list',todos,'kifune','todos');renderTodos('kifune-goal-list',goals,'kifune','goals');
+}
+function renderMkt(){
+  const todos=state.mkt.todos;const ideas=state.mkt.ideas;
+  document.getElementById('mkt-todo-badge').textContent=todos.filter(t=>!t.done).length+'件残';
+  document.getElementById('mkt-idea-badge').textContent=ideas.length+'件';
+  renderTodos('mkt-todo-list',todos,'mkt','todos');
+  const el=document.getElementById('mkt-idea-list');el.innerHTML='';
+  ideas.forEach((id,i)=>{const d=document.createElement('div');d.className='dot-item';d.innerHTML=`<div class="dot-circle"></div><div style="flex:1;font-size:13px;color:var(--text)">${id.text}</div><span class="del-btn" onclick="delMktIdea(${i})">×</span>`;el.appendChild(d);});
+}
+function renderResearch(){
+  const todos=state.research.todos;const notes=state.research.notes;
+  document.getElementById('research-todo-badge').textContent=todos.filter(t=>!t.done).length+'件残';
+  document.getElementById('research-note-badge').textContent=notes.length+'件';
+  renderTodos('research-todo-list',todos,'research','todos');
+  const el=document.getElementById('research-note-list');el.innerHTML='';
+  notes.forEach((n,i)=>{const d=document.createElement('div');d.className='dot-item';d.innerHTML=`<div class="dot-circle"></div><div style="flex:1;font-size:13px;color:var(--text)">${n.text}</div><span class="del-btn" onclick="delNote(${i})">×</span>`;el.appendChild(d);});
+}
+function renderOrg(){
+  const todos=state.org.todos||[];const strats=state.org.strategies||[];
+  document.getElementById('org-todo-badge').textContent=todos.filter(t=>!t.done).length+'件残';
+  renderTodos('org-todo-list',todos,'org','todos');
+  const el=document.getElementById('strategy-list');el.innerHTML='';
+  strats.forEach((s,i)=>{const d=document.createElement('div');d.className='dot-item';d.innerHTML=`<div class="dot-circle"></div><div style="flex:1;font-size:13px;color:var(--text)">${s.text}</div><span class="del-btn" onclick="delStrategy(${i})">×</span>`;el.appendChild(d);});
+}
+function gcalUrl(title,date){
+  const d=date.replace(/-/g,'');
+  const next=new Date(date);next.setDate(next.getDate()+1);
+  const d2=next.toISOString().slice(0,10).replace(/-/g,'');
+  return `https://calendar.google.com/calendar/render?action=TEMPLATE&text=${encodeURIComponent(title)}&dates=${d}/${d2}`;
+}
+function renderTodos(elId,todos,sec,key){
+  const el=document.getElementById(elId);el.innerHTML='';
+  if(!todos||!todos.length){el.innerHTML='<div style="font-size:12px;color:var(--text3);padding:8px 0;font-style:italic">タスクがありません</div>';return;}
+  todos.forEach((t,i)=>{
+    const d=document.createElement('div');d.className='todo-item';
+    const dateHtml=t.date?`<span class="todo-date">${t.date.slice(5).replace('-','/')}</span><a class="gcal-btn" href="${gcalUrl(t.text,t.date)}" target="_blank">GCal</a>`:'';
+    d.innerHTML=`<div class="chk${t.done?' done':''}" onclick="toggleTodo('${sec}','${key}',${i})"></div><div class="todo-text${t.done?' done':''}" onclick="toggleTodo('${sec}','${key}',${i})">${t.text}</div>${dateHtml}<span class="del-btn" onclick="delItem('${sec}','${key}',${i})">×</span>`;
+    el.appendChild(d);
+  });
+}
+function renderPipes(){
+  const pipes=state.sky.pipes;
+  document.getElementById('pipe-badge').textContent=pipes.length+'本';
+  const el=document.getElementById('pipe-list');el.innerHTML='';
+  if(!pipes.length){el.innerHTML='<div style="font-size:12px;color:var(--text3);padding:8px 0;font-style:italic">パイプラインが空です</div>';return;}
+  pipes.forEach((p,i)=>{const d=document.createElement('div');d.className='pipe-item';d.innerHTML=`<span class="pipe-stage ${p.stage}">${stageLabel[p.stage]}</span><span class="pipe-title">${p.title}</span><span class="pipe-date">${p.date||''}</span><span class="pipe-del" onclick="delPipe(${i})">×</span>`;el.appendChild(d);});
+}
+
+// Calendar
+let calY=now.getFullYear(),calM=now.getMonth();
+function allEvents(){return [...(state.events||[]),...(state.gcalEvents||[])].sort((a,b)=>a.date.localeCompare(b.date));}
+function renderCal(){
+  document.getElementById('cal-title').textContent=calY+'年'+(calM+1)+'月';
+  const first=new Date(calY,calM,1).getDay();
+  const days=new Date(calY,calM+1,0).getDate();
+  const grid=document.getElementById('cal-grid');grid.innerHTML='';
+  ['日','月','火','水','木','金','土'].forEach(d=>{const h=document.createElement('div');h.className='cal-head';h.textContent=d;grid.appendChild(h);});
+  const prev=new Date(calY,calM,0).getDate();
+  for(let i=0;i<first;i++){const d=document.createElement('div');d.className='cal-day other';d.innerHTML=`<div class="cal-num">${prev-first+i+1}</div>`;grid.appendChild(d);}
+  for(let day=1;day<=days;day++){
+    const isToday=calY===now.getFullYear()&&calM===now.getMonth()&&day===now.getDate();
+    const ds=calY+'-'+String(calM+1).padStart(2,'0')+'-'+String(day).padStart(2,'0');
+    const evs=allEvents().filter(e=>e.date===ds);
+    const d=document.createElement('div');d.className='cal-day'+(isToday?' today':'');
+    d.innerHTML=`<div class="cal-num">${day}</div>${evs.map(e=>`<div class="cal-ev ${secColorClass[e.sec]||'ev-sky'}">${e.title}</div>`).join('')}`;
+    grid.appendChild(d);
+  }
+  const total=first+days;const rem2=total%7===0?0:7-(total%7);
+  for(let i=1;i<=rem2;i++){const d=document.createElement('div');d.className='cal-day other';d.innerHTML=`<div class="cal-num">${i}</div>`;grid.appendChild(d);}
+  const todayStr=now.toISOString().slice(0,10);
+  const up=allEvents().filter(e=>e.date>=todayStr).slice(0,6);
+  const ul=document.getElementById('upcoming-list');ul.innerHTML='';
+  if(!up.length){ul.innerHTML='<div style="font-size:12px;color:var(--text3);font-style:italic;padding:8px 0">予定がありません</div>';return;}
+  up.forEach(e=>{const d=document.createElement('div');d.className='upc-item';d.innerHTML=`<span class="pipe-stage ${secColorClass[e.sec]||'ev-sky'}" style="font-size:10px">${e.date}</span><span style="flex:1;font-size:13px;color:var(--text)">${e.title}</span>${e.sec!=='gcal'?`<span class="del-btn" onclick="delEvent('${e.date}','${e.title}')">×</span>`:''}`;ul.appendChild(d);});
+}
+function changeMonth(d){calM+=d;if(calM<0){calM=11;calY--;}if(calM>11){calM=0;calY++;}renderCal();}
+function addEvent(){const t=document.getElementById('ev-title-inp').value.trim();const d=document.getElementById('ev-date-inp').value;const s=document.getElementById('ev-sec-inp').value;if(!t||!d)return;state.events.push({title:t,date:d,sec:s});document.getElementById('ev-title-inp').value='';save();renderCal();}
+function delEvent(date,title){state.events=state.events.filter(e=>!(e.date===date&&e.title===title));save();renderCal();}
+async function syncGCal(){
+  if(!state.gsUrl){alert('シート連携タブでGAS URLを設定してください');return;}
+  const btn=document.getElementById('gcal-btn');btn.textContent='同期中...';
+  try{
+    const res=await fetch(state.gsUrl+'?action=gcal&calId='+encodeURIComponent(state.gcalId||'primary'),{redirect:'follow'});
+    if(!res.ok){btn.textContent='通信エラー: HTTP '+res.status+' — 再試行 ↻';return;}
+    const data=await res.json();
+    if(data.error){btn.textContent='GASエラー: '+data.error+' — 再試行 ↻';return;}
+    if(data.events){
+      state.gcalEvents=data.events.map(e=>({title:e.title,date:e.date,sec:'gcal'}));
+      save();renderCal();
+      btn.textContent='同期完了 ✓ ('+data.events.length+'件) — 再同期する ↻';
+      setTimeout(()=>{btn.textContent='Googleカレンダーと同期する ↻';},5000);
+    }else{
+      btn.textContent='取得できませんでした（レスポンス形式が不正）— 再試行 ↻';
+    }
+  }catch(e){
+    btn.textContent='同期失敗: '+e.message+' — 再試行 ↻';
+  }
+}
+
+// Reminder
+function renderReminders(){
+  const rs=state.reminders||[];
+  document.getElementById('remind-count').textContent=rs.length;
+  document.getElementById('remind-badge').textContent=rs.length+'件';
+  const el=document.getElementById('remind-list');el.innerHTML='';
+  if(!rs.length){el.innerHTML='<div style="font-size:12px;color:var(--text3);font-style:italic;padding:8px 0">リマインダーがありません</div>';return;}
+  rs.forEach((r,i)=>{const d=document.createElement('div');d.className='remind-item';d.innerHTML=`<div class="rdot dot-${r.sec||'sky'}"></div><div class="remind-body"><div class="remind-title">${r.title}</div><div class="remind-time">${r.time} ・ ${secLabel[r.sec]||r.sec}</div></div><span class="remind-del" onclick="delReminder(${i})">×</span>`;el.appendChild(d);});
+}
+function addReminder(){const t=document.getElementById('remind-title-inp').value.trim();const time=document.getElementById('remind-time-inp').value;const sec=document.getElementById('remind-sec-inp').value;if(!t)return;if(!state.reminders)state.reminders=[];state.reminders.push({title:t,time,sec});document.getElementById('remind-title-inp').value='';save();renderReminders();}
+function delReminder(i){state.reminders.splice(i,1);save();renderReminders();}
+async function requestNotif(){if(!('Notification' in window)){alert('このブラウザは通知に対応していません');return;}const p=await Notification.requestPermission();document.getElementById('notif-perm').textContent=p==='granted'?'許可済み':p==='denied'?'拒否済み':'未許可';}
+function testNotif(){if(Notification.permission==='granted'){new Notification('Oh!ダッシュボード',{body:'テスト通知です！正常に動作しています。'});}else{alert('通知を許可してください');}}
+function checkReminders(){if(Notification.permission!=='granted')return;const t=new Date();const ts=String(t.getHours()).padStart(2,'0')+':'+String(t.getMinutes()).padStart(2,'0');(state.reminders||[]).forEach(r=>{if(r.time===ts){new Notification('参謀DB: '+r.title,{body:(secLabel[r.sec]||r.sec)+'のリマインダーです'});}});}
+setInterval(checkReminders,60000);
+
+// GS
+function renderGS(){
+  const url=state.gsUrl||'';document.getElementById('gs-url-inp').value=url;
+  document.getElementById('gs-status').textContent=url?'設定済み: '+url.slice(0,50)+'...':'URLが未設定です';
+  document.getElementById('gs-status').className='gs-status '+(url?'gs-ok':'');
+  const gid=state.gcalId||'';document.getElementById('gcal-id-inp').value=gid;
+  document.getElementById('gcal-status').textContent=gid?'設定済み: '+gid:'未設定';
+  document.getElementById('gcal-status').className='gs-status '+(gid?'gs-ok':'');
+  document.getElementById('auto-load-chk').checked=!!state.autoLoad;
+}
+function saveGsUrl(){const url=document.getElementById('gs-url-inp').value.trim();state.gsUrl=url;save();renderGS();addLog(url?'Apps Script URLを保存しました':'URLをクリアしました');}
+function saveGCalId(){const id=document.getElementById('gcal-id-inp').value.trim();state.gcalId=id;save();renderGS();addLog(id?'カレンダーIDを保存しました: '+id:'クリアしました');}
+function addLog(msg){const el=document.getElementById('sync-log');const t=new Date().toLocaleTimeString('ja-JP');const line=document.createElement('div');line.textContent=t+' — '+msg;if(el.querySelector('span'))el.innerHTML='';el.insertBefore(line,el.firstChild);}
+function toggleAutoLoad(){state.autoLoad=document.getElementById('auto-load-chk').checked;save();addLog(state.autoLoad?'自動読み込みON':'自動読み込みOFF');}
+async function loadFromSheet(){
+  if(!state.gsUrl){addLog('エラー: URLが未設定です');return;}addLog('シートから読み込み中...');
+  try{const res=await fetch(state.gsUrl+'?action=load');const data=await res.json();
+    if(data.state){const loaded=JSON.parse(data.state);const keep={gsUrl:state.gsUrl,gcalId:state.gcalId,autoLoad:state.autoLoad};state=Object.assign(loaded,keep);save();renderAll();addLog('読み込み完了 ✓');}
+    else addLog('データが見つかりません（先に送信してください）');}
+  catch(e){addLog('読み込み失敗。URLを確認してください');}
+}
+async function syncToSheet(type){
+  if(!state.gsUrl){addLog('エラー: URLが未設定です');return;}addLog((type==='all'?'全データ':type)+'を送信中...');
+  const data={type,timestamp:new Date().toISOString(),sky:state.sky,kifune:state.kifune,mkt:state.mkt,research:state.research,org:state.org,events:state.events,gcalEvents:state.gcalEvents||[],reminders:state.reminders};
+  try{await fetch(state.gsUrl,{method:'POST',body:JSON.stringify(data)});addLog('送信完了 ✓');}
+  catch(e){addLog('送信完了（レスポンス確認不可）');}
+}
+
+// ===== 音声メモ =====
+function isDeliveryNear(s){
+  if(!s)return false;
+  let d=new Date(s);
+  if(isNaN(d.getTime())){const m=s.match(/^(\d{1,2})\/(\d{1,2})$/);if(m)d=new Date(now.getFullYear(),+m[1]-1,+m[2]);else return false;}
+  const diff=(d-now)/(864e5);return diff>=-1&&diff<=3;
+}
+function orderCardHTML(o,i,showDone){
+  const near=isDeliveryNear(o.delivery);
+  const deliveryHtml=o.delivery?`<span class="${near?'order-delivery-warn':''}">📅 納期: ${o.delivery}${near?' ⚠':''}` + `</span>`:'';
+  return `<div class="order-top"><span class="order-customer">${o.customer||'（名前未入力）'}</span><div style="display:flex;gap:5px">${showDone?`<button class="done-btn" onclick="doneOrder(${i})">済み ✓</button>`:''}<button class="order-edit-btn" onclick="editOrder(${i})">編集</button></div></div>
+<div class="order-meta">${o.product?`<span>📦 ${o.product}</span>`:''}${o.qty?`<span>数量: ${o.qty}</span>`:''}${deliveryHtml}${o.staff?`<span>担当: ${o.staff}</span>`:''}</div>
+${o.note?`<div class="order-note-text">${o.note}</div>`:''}`;
+}
+function editOrder(i){
+  const o=state.orders[i];const card=document.getElementById('order-card-'+i);if(!card)return;
+  const esc=v=>(v||'').replace(/"/g,'&quot;');
+  card.innerHTML=`<div class="order-edit-form">
+    <input id="oe-cu-${i}" value="${esc(o.customer)}" placeholder="お客様名">
+    <div class="row"><input id="oe-st-${i}" value="${esc(o.staff)}" placeholder="担当者"><input id="oe-dl-${i}" value="${esc(o.delivery)}" placeholder="希望納期"></div>
+    <input id="oe-pr-${i}" value="${esc(o.product)}" placeholder="商品名">
+    <div class="row"><input id="oe-qt-${i}" value="${esc(o.qty)}" placeholder="数量"><input id="oe-no-${i}" value="${esc(o.note)}" placeholder="メモ"></div>
+    <div class="order-edit-btns">
+      <button style="background:var(--text);color:#fff" onclick="saveOrderEdit(${i})">保存</button>
+      <button style="background:var(--bg2);color:var(--text2)" onclick="renderOrders()">キャンセル</button>
+    </div></div>`;
+}
+function saveOrderEdit(i){
+  const g=id=>document.getElementById(id+'−'+i)||document.getElementById(id+'-'+i);
+  state.orders[i].customer=document.getElementById('oe-cu-'+i).value.trim();
+  state.orders[i].staff=document.getElementById('oe-st-'+i).value.trim();
+  state.orders[i].delivery=document.getElementById('oe-dl-'+i).value.trim();
+  state.orders[i].product=document.getElementById('oe-pr-'+i).value.trim();
+  state.orders[i].qty=document.getElementById('oe-qt-'+i).value.trim();
+  state.orders[i].note=document.getElementById('oe-no-'+i).value.trim();
+  save();renderOrders();
+}
+function closeVoiceModal(){document.getElementById('voice-modal').style.display='none';}
+function openVoiceModal(){document.getElementById('voice-modal').style.display='flex';}
+function renderOrders(){
+  if(!state.orders)state.orders=[];
+  // 日常業務ページの最近の音声メモ
+  const rel=document.getElementById('recent-order-list');
+  if(!rel)return;
+  if(!orders.length){rel.innerHTML='<div style="font-size:12px;color:var(--text3);font-style:italic;padding:4px 0">受注がありません</div>';return;}
+  rel.innerHTML='';
+  orders.slice(0,5).forEach((o,i)=>{const d=document.createElement('div');d.className='order-card'+(isDeliveryNear(o.delivery)?' order-alert':'');d.id='order-card-'+i;d.style.marginBottom='6px';d.innerHTML=orderCardHTML(o,i,true);rel.appendChild(d);});
+}
+function addOrder(){
+  const fields={customer:'order-customer',staff:'order-staff',delivery:'order-delivery',product:'order-product',qty:'order-qty',note:'order-note'};
+  const o={};let hasData=false;
+  Object.entries(fields).forEach(([key,id])=>{const v=document.getElementById(id).value.trim();o[key]=v;if(v)hasData=true;});
+  if(!hasData)return;
+  o.createdAt=new Date().toISOString();
+  if(!state.orders)state.orders=[];
+  if(!state.knownCustomers)state.knownCustomers=[];
+  if(!state.knownProducts)state.knownProducts=[];
+  state.orders.unshift(o);
+  if(o.customer&&!state.knownCustomers.includes(o.customer)){state.knownCustomers.push(o.customer);updateDatalist('dl-customers',state.knownCustomers);}
+  if(o.product&&!state.knownProducts.includes(o.product)){state.knownProducts.push(o.product);updateDatalist('dl-products',state.knownProducts);}
+  Object.values(fields).forEach(id=>document.getElementById(id).value='');
+  save();renderOrders();
+}
+function doneOrder(i){state.orders.splice(i,1);save();renderOrders();}
+function updateDatalist(id,items){
+  const dl=document.getElementById(id);if(!dl)return;
+  dl.innerHTML=items.map(v=>`<option value="${v}">`).join('');
+}
+function parseVoiceSequential(text){
+  document.getElementById('order-note').value=text;
+  const segs=text.trim().split(/[\s　、，・]+/).filter(s=>s.length>0);
+  if(!segs.length)return;
+  const knownC=state.knownCustomers||[];
+  const knownP=state.knownProducts||[];
+  let customer='',product='',qty='';
+  // 学習済み名前を最優先でマッチ
+  for(const c of knownC){if(text.includes(c)){customer=c;break;}}
+  for(const p of knownP){if(text.includes(p)){product=p;break;}}
+  // 未学習なら順番で割り当て: 1番目=customer, 最後の数字含みセグメント=qty, 残り=product
+  if(!customer)customer=segs[0];
+  const qtyIdx=segs.map((s,i)=>(/\d/.test(s)?i:-1)).filter(i=>i>=0).pop();
+  if(qtyIdx!=null&&qtyIdx!==undefined){
+    qty=segs[qtyIdx];
+    if(!product){
+      const mid=segs.filter((_,i)=>i>0&&i!==qtyIdx);
+      if(mid.length)product=mid.join('');
+    }
+  } else if(!product&&segs.length>1){
+    product=segs.slice(1).join('');
+  }
+  if(customer)document.getElementById('order-customer').value=customer;
+  if(product)document.getElementById('order-product').value=product;
+  if(qty)document.getElementById('order-qty').value=qty;
+}
+function startHomeVoice(){
+  const SR=window.SpeechRecognition||window.webkitSpeechRecognition;
+  if(!SR){alert('音声入力非対応ブラウザです\nChromeかSafariをお使いください');return;}
+  const btn=document.getElementById('home-voice-btn');
+  if(btn._rec){btn._rec.stop();return;}
+  const rec=new SR();rec.lang='ja-JP';rec.interimResults=false;rec.maxAlternatives=1;rec.continuous=false;
+  btn._rec=rec;
+  btn.innerHTML='<span class="mic-icon">🔴</span><span class="mic-label">タップして停止</span><span class="mic-hint">話し終えたらもう一度タップ</span>';
+  btn.classList.add('recording');
+  const timer=setTimeout(()=>rec.stop(),15000);
+  rec.start();
+  rec.onresult=(e)=>{clearTimeout(timer);parseVoiceSequential(e.results[0][0].transcript);openVoiceModal();};
+  rec.onerror=()=>{clearTimeout(timer);};
+  rec.onend=()=>{
+    clearTimeout(timer);btn._rec=null;
+    btn.innerHTML='<span class="mic-icon">🎤</span><span class="mic-label">音声メモを録音する</span><span class="mic-hint">お客様名 → 商品名 → 個数 の順に話してください</span>';
+    btn.classList.remove('recording');
+  };
+}
+function startVoice(){
+  const SR=window.SpeechRecognition||window.webkitSpeechRecognition;
+  if(!SR){alert('このブラウザは音声入力に対応していません\nChromeかSafariをお使いください');return;}
+  const btn=document.getElementById('voice-btn');
+  if(btn._rec){btn._rec.stop();return;}
+  const rec=new SR();rec.lang='ja-JP';rec.interimResults=false;rec.maxAlternatives=1;rec.continuous=false;
+  btn._rec=rec;
+  btn.innerHTML='<span class="mic-icon">🔴</span><span class="mic-label">タップして停止</span><span class="mic-hint">話し終えたらもう一度タップ</span>';btn.classList.add('recording');
+  const timer=setTimeout(()=>rec.stop(),15000);
+  rec.start();
+  rec.onresult=(e)=>{clearTimeout(timer);parseVoiceSequential(e.results[0][0].transcript);};
+  rec.onerror=(e)=>{clearTimeout(timer);btn._rec=null;};
+  rec.onend=()=>{clearTimeout(timer);btn._rec=null;btn.innerHTML='<span class="mic-icon">🎤</span><span class="mic-label">タップして音声入力</span><span class="mic-hint">お客様名 → 商品名 → 個数 の順に話してください</span>';btn.classList.remove('recording');};
+}
+
+// ===== ホーム =====
+function renderHome(){
+  const h=now.getHours();
+  const greet=h<5?'お疲れ様です':h<12?'おはようございます':h<18?'こんにちは':'こんばんは';
+  document.getElementById('home-greeting').textContent=greet+'、安部さん';
+  document.getElementById('home-date').textContent=now.getFullYear()+'年'+(now.getMonth()+1)+'月'+now.getDate()+'日（'+['日','月','火','水','木','金','土'][now.getDay()]+'）';
+  // 今日の予定
+  const todayStr=now.toISOString().slice(0,10);
+  const todayEvs=allEvents().filter(e=>e.date===todayStr);
+  const evEl=document.getElementById('home-events');
+  if(!todayEvs.length){evEl.innerHTML='<div class="home-empty">今日の予定はありません</div>';}
+  else{evEl.innerHTML=todayEvs.map(e=>`<div class="home-row"><div class="home-dot" style="background:${e.sec==='kifune'?'var(--kifune)':'var(--sky)'}"></div><span class="home-val">${e.title}</span></div>`).join('');}
+  // SkyStage TODO
+  const skyPending=(state.sky.todos||[]).filter(t=>!t.done);
+  document.getElementById('home-sky-badge').textContent=skyPending.length+'件残';
+  const skyEl=document.getElementById('home-sky-todos');
+  if(!skyPending.length){skyEl.innerHTML='<div class="home-empty">すべて完了！</div>';}
+  else{skyEl.innerHTML=skyPending.slice(0,4).map(t=>`<div class="home-row"><div class="home-dot" style="background:var(--sky)"></div><span class="home-val">${t.text}</span>${t.date?`<span style="font-size:11px;color:var(--text3)">${t.date.slice(5).replace('-','/')}</span>`:''}</div>`).join('')+(skyPending.length>4?`<div class="home-empty">他${skyPending.length-4}件...</div>`:'');}
+  // キフネ TODO
+  const kifPending=(state.kifune.todos||[]).filter(t=>!t.done);
+  document.getElementById('home-kifune-badge').textContent=kifPending.length+'件残';
+  const kifEl=document.getElementById('home-kifune-todos');
+  if(!kifPending.length){kifEl.innerHTML='<div class="home-empty">すべて完了！</div>';}
+  else{kifEl.innerHTML=kifPending.slice(0,4).map(t=>`<div class="home-row"><div class="home-dot" style="background:var(--kifune)"></div><span class="home-val">${t.text}</span>${t.date?`<span style="font-size:11px;color:var(--text3)">${t.date.slice(5).replace('-','/')}</span>`:''}</div>`).join('')+(kifPending.length>4?`<div class="home-empty">他${kifPending.length-4}件...</div>`:'');}
+  // 未処理受注
+  const orders=state.orders||[];
+  document.getElementById('home-orders-badge').textContent=orders.length+'件';
+  const ordEl=document.getElementById('home-orders');
+  if(!orders.length){ordEl.innerHTML='<div class="home-empty">未処理受注はありません</div>';}
+  else{ordEl.innerHTML=orders.slice(0,4).map(o=>`<div class="home-row"><div class="home-dot" style="background:var(--kifune)"></div><span class="home-val">${o.customer||'?'}</span><span style="font-size:12px;color:var(--text2)">${o.product||''} ${o.qty||''}</span></div>`).join('')+(orders.length>4?`<div class="home-empty">他${orders.length-4}件...</div>`:'');}
+  // 週次レビュー
+  const revEl=document.getElementById('home-review');
+  const skyDone=(state.sky.todos||[]).filter(t=>t.done);
+  const kifDone=(state.kifune.todos||[]).filter(t=>t.done);
+  const skyLeft=(state.sky.todos||[]).filter(t=>!t.done);
+  const kifLeft=(state.kifune.todos||[]).filter(t=>!t.done);
+  let html='';
+  if(skyDone.length||kifDone.length){
+    html+='<div class="review-sec"><div class="review-sec-title">✅ 完了済み</div>';
+    skyDone.forEach(t=>{html+=`<div class="review-done"><span style="color:var(--sky);font-size:10px">Sky</span>${t.text}</div>`;});
+    kifDone.forEach(t=>{html+=`<div class="review-done"><span style="color:var(--kifune);font-size:10px">Kif</span>${t.text}</div>`;});
+    html+='</div>';
+  }
+  if(skyLeft.length||kifLeft.length){
+    html+='<div class="review-sec"><div class="review-sec-title">📋 残タスク</div>';
+    skyLeft.forEach(t=>{html+=`<div class="review-pending"><span style="color:var(--sky);font-size:10px">Sky</span>${t.text}</div>`;});
+    kifLeft.forEach(t=>{html+=`<div class="review-pending"><span style="color:var(--kifune);font-size:10px">Kif</span>${t.text}</div>`;});
+    html+='</div>';
+  }
+  if(!html)html='<div class="home-empty">TODOがありません</div>';
+  revEl.innerHTML=html;
+}
+
+// ===== アイデアクイックメモ =====
+function renderIdeas(){
+  if(!state.sky.videoIdeas)state.sky.videoIdeas=[];
+  const ideas=state.sky.videoIdeas;
+  document.getElementById('idea-badge').textContent=ideas.length+'件';
+  const el=document.getElementById('idea-list');el.innerHTML='';
+  if(!ideas.length){el.innerHTML='<div class="home-empty" style="margin-bottom:6px">アイデアがありません</div>';return;}
+  ideas.forEach((idea,i)=>{
+    const d=document.createElement('div');d.className='idea-item';
+    d.innerHTML=`<span class="idea-text">${idea.text}</span><button class="idea-to-pipe" onclick="ideaToPipeline(${i})">パイプラインへ</button><span class="del-btn" onclick="delIdea(${i})">×</span>`;
+    el.appendChild(d);
+  });
+}
+function addIdea(){
+  const inp=document.getElementById('idea-inp');const v=inp.value.trim();if(!v)return;
+  if(!state.sky.videoIdeas)state.sky.videoIdeas=[];
+  state.sky.videoIdeas.unshift({text:v});inp.value='';save();renderIdeas();
+}
+function delIdea(i){state.sky.videoIdeas.splice(i,1);save();renderIdeas();}
+function ideaToPipeline(i){
+  const idea=state.sky.videoIdeas[i];
+  state.sky.pipes.unshift({title:idea.text,stage:'s-idea',date:''});
+  state.sky.videoIdeas.splice(i,1);
+  save();renderIdeas();renderSky();
+}
+function startIdeaVoice(){
+  const SR=window.SpeechRecognition||window.webkitSpeechRecognition;
+  if(!SR){alert('音声入力非対応ブラウザです');return;}
+  const rec=new SR();rec.lang='ja-JP';rec.interimResults=false;
+  const btn=document.getElementById('idea-voice-btn');
+  btn.textContent='🔴 録音中...';btn.classList.add('recording');
+  rec.start();
+  rec.onresult=(e)=>{
+    const txt=e.results[0][0].transcript;
+    if(!state.sky.videoIdeas)state.sky.videoIdeas=[];
+    state.sky.videoIdeas.unshift({text:txt});save();renderIdeas();
+  };
+  rec.onerror=()=>{};
+  rec.onend=()=>{btn.textContent='🎤 音声でアイデア記録';btn.classList.remove('recording');};
+}
+
+// ===== 受注月次集計 =====
+function renderOrderStats(){
+  const el=document.getElementById('order-stats-list');
+  const badgeEl=document.getElementById('order-stats-month');
+  if(!el)return;
+  const orders=state.orders||[];
+  const ym=now.getFullYear()+'-'+String(now.getMonth()+1).padStart(2,'0');
+  const thisMonth=orders.filter(o=>o.createdAt&&o.createdAt.startsWith(ym));
+  badgeEl.textContent=thisMonth.length+'件';
+  if(!thisMonth.length){el.innerHTML='<div class="home-empty">今月の受注はありません</div>';return;}
+  const byProduct={};
+  thisMonth.forEach(o=>{const p=o.product||'不明';byProduct[p]=(byProduct[p]||0)+1;});
+  el.innerHTML=Object.entries(byProduct).sort((a,b)=>b[1]-a[1]).map(([p,c])=>`<div class="stat-row"><span>${p}</span><span class="stat-num">${c}件</span></div>`).join('');
+}
+
+// ===== AI Advisor (Gemini) =====
+const aiHistories={sky:[],kifune:[],mkt:[],strategy:[]};
+function saveAiHistory(){try{localStorage.setItem('sanbo_ai_hist',JSON.stringify(aiHistories));}catch(e){}}
+function loadAiHistory(){try{const h=localStorage.getItem('sanbo_ai_hist');if(h)Object.assign(aiHistories,JSON.parse(h));}catch(e){}}
+function renderAiHistory(sec){
+  const msgEl=document.getElementById('ai-'+sec+'-msgs');if(!msgEl)return;msgEl.innerHTML='';
+  (aiHistories[sec]||[]).forEach(m=>{
+    const div=document.createElement('div');
+    if(m.role==='user'){div.className='ai-msg-user';div.textContent=m.parts[0].text;}
+    else{div.className='ai-msg-ai';const t=m.parts[0].text;div.innerHTML=t.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/\*\*(.+?)\*\*/g,'<strong>$1</strong>').replace(/\*(.+?)\*/g,'<em>$1</em>').replace(/^#{1,3}\s(.+)$/gm,'<strong>$1</strong>').replace(/\n/g,'<br>');}
+    msgEl.appendChild(div);
+  });
+}
+function resetAdvisor(sec){
+  aiHistories[sec]=[];saveAiHistory();
+  document.getElementById('ai-'+sec+'-msgs').innerHTML='';
+  if(getGeminiKey())askAdvisor(sec,getAutoPrompt(sec));
+}
+function checkWeeklySummary(){
+  if(now.getDay()!==1||!getGeminiKey())return;
+  const todayStr=now.toISOString().slice(0,10);
+  if(localStorage.getItem('sanbo_weekly_date')===todayStr)return;
+  localStorage.setItem('sanbo_weekly_date',todayStr);
+  setTimeout(()=>askAdvisor('kifune','先週の受注件数・完了TODO・未完了TODOを確認して、今週の優先方針を3〜4文でまとめてください'),2000);
+}
+const DEFAULT_AUTO_PROMPT='今日の状況を確認して、今すぐ取り組むべきことと改善提案を提示して';
+function getAutoPrompt(sec){return localStorage.getItem('sanbo_auto_'+sec)||DEFAULT_AUTO_PROMPT;}
+function saveAutoPrompt(sec){
+  const v=document.getElementById('ai-'+sec+'-auto-inp').value.trim();
+  if(!v)return;
+  localStorage.setItem('sanbo_auto_'+sec,v);
+  const btn=document.querySelector('#ai-'+sec+'-auto-inp').nextElementSibling;
+  btn.textContent='保存済 ✓';setTimeout(()=>btn.textContent='保存',1500);
+}
+function getGeminiKey(){return localStorage.getItem('sanbo_gemini_key')||'';}
+function saveGeminiKey(){
+  const v=document.getElementById('gemini-key-inp').value.trim();
+  localStorage.setItem('sanbo_gemini_key',v);
+  document.getElementById('gemini-key-status').textContent=v?'設定済み（'+v.slice(0,10)+'...）':'クリアしました';
+  document.getElementById('gemini-key-status').className='gs-status '+(v?'gs-ok':'');
+  document.getElementById('gemini-key-inp').value='';
+}
+function buildContext(sec){
+  const todayStr=now.toISOString().slice(0,10);
+  const upcoming=(state.events||[]).filter(e=>e.date>=todayStr).slice(0,5).map(e=>e.date+' '+e.title).join('、')||'なし';
+  if(sec==='sky'){
+    const todos=(state.sky.todos||[]).filter(t=>!t.done).map(t=>t.text+(t.date?' ('+t.date+')':'')).join('、')||'なし';
+    const pipes=(state.sky.pipes||[]).map(p=>p.title+'('+stageLabel[p.stage]+')').join('、')||'なし';
+    return `【今日】${now.toLocaleDateString('ja-JP')}\n【直近の予定】${upcoming}\n【未完了TODO】${todos}\n【動画パイプライン】${pipes}`;
+  }else{
+    const todos=(state.kifune.todos||[]).filter(t=>!t.done).map(t=>t.text+(t.date?' ('+t.date+')':'')).join('、')||'なし';
+    const orders=(state.orders||[]).slice(0,3).map(o=>(o.customer||'?')+' '+(o.product||'?')+' '+(o.qty||'')).join('、')||'なし';
+    return `【今日】${now.toLocaleDateString('ja-JP')}\n【直近の予定】${upcoming}\n【未完了TODO】${todos}\n【直近の受注】${orders}`;
+  }
+}
+const aiSysPrompts={
+  sky:`あなたは安部さん専属のYouTubeアドバイザーです。北九州市戸畑区在住の会社員で「SkyStage」（バイク・マラソン・祭りジャンル）を運営。登録者増加・収益化が目標。ダッシュボードの現状を踏まえ、今の状況への具体的な洞察と次のアクションを自然な文章で3〜4文にまとめてください。箇条書き・ヘッダー・前置き挨拶は不要。`,
+  kifune:`あなたは安部さん専属の業務・営業アドバイザーです。北九州市戸畑区在住の会社員（営業部長）で、会社（キフネ）は若松区にあります。YouTube副業も運営。本業との両立・効率化が課題。ダッシュボードの現状を踏まえ、今の状況への具体的な洞察と次のアクションを自然な文章で3〜4文にまとめてください。箇条書き・ヘッダー・前置き挨拶は不要。`,
+  mkt:`あなたは安部さん専属のYouTubeマーケ・調査アドバイザーです。「SkyStage」（バイク・マラソン・祭りジャンル、北九州市）のチャンネル成長を支援。マーケティング施策・競合調査・トレンド分析が専門。具体的で実践的なアドバイスを自然な文章で3〜4文にまとめてください。箇条書き・ヘッダー・前置き挨拶は不要。`,
+  strategy:`あなたは安部さん専属の営業戦略アドバイザーです。北九州市若松区のキフネ社で営業部長を務める安部さんの経営・組織・戦略を支援。部下育成・売上戦略・中期計画が専門。ダッシュボードの現状を踏まえ、営業部長視点の戦略的な洞察を自然な文章で3〜4文にまとめてください。箇条書き・ヘッダー・前置き挨拶は不要。`
+};
+async function askAdvisor(sec,preset){
+  const apiKey=getGeminiKey();
+  const msgEl=document.getElementById('ai-'+sec+'-msgs');
+  if(!apiKey){msgEl.innerHTML='<div class="ai-msg-loading">APIキーが未設定です。「シート連携」タブ上部で設定してください。</div>';return;}
+  const inp=document.getElementById('ai-'+sec+'-inp');
+  const q=preset||inp.value.trim();if(!q)return;inp.value='';
+  if(!aiHistories[sec])aiHistories[sec]=[];
+  aiHistories[sec].push({role:'user',parts:[{text:q}]});
+  if(aiHistories[sec].length>20)aiHistories[sec]=aiHistories[sec].slice(-20);
+  const userDiv=document.createElement('div');userDiv.className='ai-msg-user';userDiv.textContent=q;msgEl.appendChild(userDiv);
+  const loadDiv=document.createElement('div');loadDiv.className='ai-msg-loading';loadDiv.textContent='考え中...';msgEl.appendChild(loadDiv);
+  userDiv.scrollIntoView({behavior:'smooth',block:'start'});
+  try{
+    const res=await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${apiKey}`,{
+      method:'POST',headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({
+        system_instruction:{parts:[{text:aiSysPrompts[sec]+'\n\n'+buildContext(sec)}]},
+        contents:aiHistories[sec],
+        generationConfig:{maxOutputTokens:2000}
+      })
+    });
+    const data=await res.json();
+    if(data.error)throw new Error(data.error.message);
+    const reply=data.candidates[0].content.parts[0].text;
+    loadDiv.remove();
+    const aiDiv=document.createElement('div');aiDiv.className='ai-msg-ai';
+    aiDiv.innerHTML=reply.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/\*\*(.+?)\*\*/g,'<strong>$1</strong>').replace(/\*(.+?)\*/g,'<em>$1</em>').replace(/^#{1,3}\s(.+)$/gm,'<strong>$1</strong>').replace(/\n/g,'<br>');
+    msgEl.appendChild(aiDiv);
+    aiHistories[sec].push({role:'model',parts:[{text:reply}]});
+    if(aiHistories[sec].length>20)aiHistories[sec]=aiHistories[sec].slice(-20);
+    saveAiHistory();
+    aiDiv.scrollIntoView({behavior:'smooth',block:'start'});
+  }catch(e){
+    const m=e.message.match(/retry in ([\d.]+)s/i);
+    if(m){
+      aiHistories[sec].pop();
+      let secs=Math.ceil(parseFloat(m[1]))+1;
+      loadDiv.textContent=`上限到達。${secs}秒後に自動リトライします...`;
+      const t=setInterval(()=>{
+        secs--;
+        if(secs<=0){clearInterval(t);userDiv.remove();loadDiv.remove();askAdvisor(sec,q);}
+        else loadDiv.textContent=`上限到達。${secs}秒後に自動リトライします...`;
+      },1000);
+    }else{loadDiv.textContent='エラー: '+e.message;}
+  }
+}
+
+// ===== Tab / Subtab =====
+function canAutoFire(sec){
+  const today=now.toISOString().slice(0,10);
+  const key='sanbo_ai_autofire_'+sec;
+  if(localStorage.getItem(key)===today)return false;
+  localStorage.setItem(key,today);
+  return true;
+}
+function switchTab(sec){
+  ['home','kifune','sky','cal','remind','gs'].forEach((s,i)=>{
+    document.getElementById('sec-'+s).classList.toggle('active',s===sec);
+    document.querySelectorAll('.tabbar .tab')[i].classList.toggle('active',s===sec);
+  });
+  if(sec==='home')renderHome();
+  if((sec==='sky'||sec==='kifune')&&getGeminiKey()&&!(aiHistories[sec]||[]).length&&canAutoFire(sec)){
+    askAdvisor(sec,getAutoPrompt(sec));
+  }
+}
+const subDefs={sky:{subs:['main','mkt'],cls:'sky-on'},kifune:{subs:['ops','strategy'],cls:'kif-on'}};
+const subAiMap={mkt:'mkt',strategy:'strategy'};
+function switchSub(parent,sub){
+  const {subs,cls}=subDefs[parent];
+  subs.forEach(s=>document.getElementById(parent+'-sub-'+s).classList.toggle('active',s===sub));
+  document.querySelectorAll('#'+parent+'-sub-bar .subtab').forEach((t,i)=>{
+    t.classList.remove('sky-on','kif-on');
+    if(subs[i]===sub)t.classList.add(cls);
+  });
+  const aiSec=subAiMap[sub];
+  if(aiSec&&getGeminiKey()&&!(aiHistories[aiSec]||[]).length&&canAutoFire(aiSec)){
+    askAdvisor(aiSec,'現状を確認して、今取り組むべきことへの洞察を教えて');
+  }
+}
+
+// ===== CRUD =====
+function toggleTodo(sec,key,i){state[sec][key][i].done=!state[sec][key][i].done;save();renderAll();}
+function delItem(sec,key,i){state[sec][key].splice(i,1);save();renderAll();}
+function addTodo(sec){const inp=document.getElementById(sec+'-todo-inp');const v=inp.value.trim();if(!v)return;const dateInp=document.getElementById(sec+'-todo-date');const date=dateInp?dateInp.value:'';state[sec].todos.unshift({text:v,done:false,date:date});inp.value='';if(dateInp)dateInp.value='';save();renderAll();}
+function addSubTodo(sec){const inp=document.getElementById(sec+'-todo-inp');const v=inp.value.trim();if(!v)return;state[sec].todos.unshift({text:v,done:false});inp.value='';save();if(sec==='mkt')renderMkt();else renderResearch();}
+function addGoal(){const inp=document.getElementById('kifune-goal-inp');const v=inp.value.trim();if(!v)return;state.kifune.goals.unshift({text:v,done:false});inp.value='';save();renderKifune();}
+function addMktIdea(){const inp=document.getElementById('mkt-idea-inp');const v=inp.value.trim();if(!v)return;state.mkt.ideas.unshift({text:v});inp.value='';save();renderMkt();}
+function delMktIdea(i){state.mkt.ideas.splice(i,1);save();renderMkt();}
+function addNote(){const inp=document.getElementById('research-note-inp');const v=inp.value.trim();if(!v)return;state.research.notes.unshift({text:v});inp.value='';save();renderResearch();}
+function delNote(i){state.research.notes.splice(i,1);save();renderResearch();}
+function addPipe(){const t=document.getElementById('pipe-title-inp').value.trim();const s=document.getElementById('pipe-stage-inp').value;const d=document.getElementById('pipe-date-inp').value.trim();if(!t)return;state.sky.pipes.unshift({title:t,stage:s,date:d});document.getElementById('pipe-title-inp').value='';document.getElementById('pipe-date-inp').value='';save();renderSky();}
+function delPipe(i){state.sky.pipes.splice(i,1);save();renderSky();}
+function addStrategy(){const inp=document.getElementById('strategy-inp');const v=inp.value.trim();if(!v)return;if(!state.org.strategies)state.org.strategies=[];state.org.strategies.unshift({text:v});inp.value='';save();renderOrg();}
+function delStrategy(i){state.org.strategies.splice(i,1);save();renderOrg();}
+function addOrgTodo(){const inp=document.getElementById('org-todo-inp');const v=inp.value.trim();if(!v)return;if(!state.org.todos)state.org.todos=[];state.org.todos.unshift({text:v,done:false});inp.value='';save();renderOrg();}
+
+// ===== Init =====
+function renderCalBar(){
+  const todayStr=now.toISOString().slice(0,10);
+  document.getElementById('cal-bar-date').textContent=(now.getMonth()+1)+'/'+now.getDate()+'（'+['日','月','火','水','木','金','土'][now.getDay()]+'）';
+  const upcoming=allEvents().filter(e=>e.date>=todayStr).slice(0,3);
+  const el=document.getElementById('cal-bar-events');
+  if(!upcoming.length){el.innerHTML='<span class="cal-bar-none">予定なし</span>';return;}
+  el.innerHTML=upcoming.map(e=>`<span class="cal-bar-ev ${secColorClass[e.sec]||'ev-sky'}">${e.date===todayStr?'今日':''+e.date.slice(5).replace('-','/')} ${e.title}</span>`).join('');
+}
+function renderAll(){renderHome();renderSky();renderKifune();renderMkt();renderResearch();renderOrg();renderCal();renderReminders();renderGS();renderOrders();renderIdeas();renderOrderStats();renderCalBar();}
+if(Notification.permission==='granted')document.getElementById('notif-perm').textContent='許可済み';
+else if(Notification.permission==='denied')document.getElementById('notif-perm').textContent='拒否済み';
+load();renderAll();
+updateDatalist('dl-customers',state.knownCustomers||[]);
+const _gk=getGeminiKey();
+document.getElementById('gemini-key-status').textContent=_gk?'設定済み（'+_gk.slice(0,10)+'...）':'未設定';
+document.getElementById('gemini-key-status').className='gs-status '+(_gk?'gs-ok':'');
+updateDatalist('dl-products',state.knownProducts||[]);
+if(state.autoLoad&&state.gsUrl){addLog('自動読み込みを開始...');loadFromSheet();}
+document.getElementById('ai-sky-auto-inp').value=getAutoPrompt('sky');
+document.getElementById('ai-kifune-auto-inp').value=getAutoPrompt('kifune');
+loadAiHistory();renderAiHistory('sky');renderAiHistory('kifune');renderAiHistory('mkt');renderAiHistory('strategy');
+checkWeeklySummary();
+</script>
+</body>
+</html>
