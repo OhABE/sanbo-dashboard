@@ -979,13 +979,7 @@ function resetAdvisor(sec){
   document.getElementById('ai-'+sec+'-msgs').innerHTML='';
   if(getGeminiKey())askAdvisor(sec,getAutoPrompt(sec));
 }
-function checkWeeklySummary(){
-  if(now.getDay()!==1||!getGeminiKey())return;
-  const todayStr=now.toISOString().slice(0,10);
-  if(localStorage.getItem('sanbo_weekly_date')===todayStr)return;
-  localStorage.setItem('sanbo_weekly_date',todayStr);
-  setTimeout(()=>askAdvisor('kifune','先週の受注件数・完了TODO・未完了TODOを確認して、今週の優先方針を3〜4文でまとめてください'),2000);
-}
+function checkWeeklySummary(){}
 const DEFAULT_AUTO_PROMPT='今日の状況を確認して、今すぐ取り組むべきことと改善提案を提示して';
 function getAutoPrompt(sec){return localStorage.getItem('sanbo_auto_'+sec)||DEFAULT_AUTO_PROMPT;}
 function saveAutoPrompt(sec){
@@ -1085,9 +1079,6 @@ function switchTab(sec){
     document.querySelectorAll('.tabbar .tab')[i].classList.toggle('active',s===sec);
   });
   if(sec==='home')renderHome();
-  if((sec==='sky'||sec==='kifune')&&getGeminiKey()&&!(aiHistories[sec]||[]).length&&canAutoFire(sec)){
-    askAdvisor(sec,getAutoPrompt(sec));
-  }
 }
 const subDefs={sky:{subs:['main','mkt'],cls:'sky-on'},kifune:{subs:['ops','strategy'],cls:'kif-on'}};
 const subAiMap={mkt:'mkt',strategy:'strategy'};
@@ -1099,9 +1090,6 @@ function switchSub(parent,sub){
     if(subs[i]===sub)t.classList.add(cls);
   });
   const aiSec=subAiMap[sub];
-  if(aiSec&&getGeminiKey()&&!(aiHistories[aiSec]||[]).length&&canAutoFire(aiSec)){
-    askAdvisor(aiSec,'現状を確認して、今取り組むべきことへの洞察を教えて');
-  }
 }
 
 // ===== CRUD =====
