@@ -433,7 +433,7 @@ body{background:var(--bg);color:var(--text);font-family:var(--font);font-size:14
         <span class="cal-title" id="cal-title"></span>
         <button class="cal-nav-btn" onclick="changeMonth(1)">›</button>
       </div>
-      <button class="gcal-sync-btn" id="gcal-btn" onclick="syncGCal()">Googleカレンダーと同期する ↻</button>
+      <div id="gcal-btn" style="font-size:11px;color:var(--text3);text-align:right;margin-bottom:6px;cursor:pointer" onclick="syncGCal()"></div>
       <div class="cal-grid" id="cal-grid"></div>
       <div class="ev-form">
         <input id="ev-title-inp" placeholder="予定・イベント名...">
@@ -654,8 +654,8 @@ async function syncGCal(){
     if(data.events){
       state.gcalEvents=data.events.map(e=>({title:e.title,date:e.date,sec:'gcal'}));
       save();renderCal();
-      btn.textContent='同期完了 ✓ ('+data.events.length+'件) — 再同期する ↻';
-      setTimeout(()=>{btn.textContent='Googleカレンダーと同期する ↻';},5000);
+      btn.textContent='GCal 最終同期: '+new Date().toLocaleTimeString('ja-JP',{hour:'2-digit',minute:'2-digit'});
+
     }else{
       btn.textContent='取得できませんでした — 再試行 ↻';
     }
@@ -1123,6 +1123,7 @@ document.getElementById('gemini-key-status').textContent=_gk?'設定済み（'+_
 document.getElementById('gemini-key-status').className='gs-status '+(_gk?'gs-ok':'');
 updateDatalist('dl-products',state.knownProducts||[]);
 if(state.autoLoad&&state.gsUrl){addLog('自動読み込みを開始...');loadFromSheet();}
+if(state.gsUrl){syncGCal();setInterval(syncGCal,30*60*1000);}
 document.getElementById('ai-sky-auto-inp').value=getAutoPrompt('sky');
 document.getElementById('ai-kifune-auto-inp').value=getAutoPrompt('kifune');
 loadAiHistory();renderAiHistory('sky');renderAiHistory('kifune');renderAiHistory('mkt');renderAiHistory('strategy');
