@@ -647,7 +647,7 @@ async function syncGCal(){
   if(!state.gcalIcsUrl){alert('シート連携タブでGoogleカレンダーのICS URLを設定してください');return;}
   const btn=document.getElementById('gcal-btn');btn.textContent='同期中...';
   try{
-    const proxy='https://corsproxy.io/?url='+encodeURIComponent(state.gcalIcsUrl);
+    const proxy='https://api.allorigins.win/raw?url='+encodeURIComponent(state.gcalIcsUrl);
     const res=await fetch(proxy);
     if(!res.ok){btn.textContent='通信エラー: HTTP '+res.status+' — 再試行 ↻';return;}
     const text=await res.text();
