@@ -699,7 +699,14 @@ function renderGS(){
   document.getElementById('gcal-status').className='gs-status '+(url?'gs-ok':'');
   document.getElementById('auto-load-chk').checked=!!state.autoLoad;
 }
-function saveGsUrl(){const url=document.getElementById('gs-url-inp').value.trim();state.gsUrl=url;save();renderGS();addLog(url?'Apps Script URLを保存しました':'URLをクリアしました');}
+function saveGsUrl(){
+  const url=document.getElementById('gs-url-inp').value.trim();
+  state.gsUrl=url;
+  try{localStorage.setItem(KEY,JSON.stringify(state));}catch(e){}
+  renderGS();
+  addLog(url?'Apps Script URLを保存しました':'URLをクリアしました');
+  if(url){loadFromSheet();syncGCal();setInterval(syncGCal,30*60*1000);}
+}
 function saveGCalId(){const id=document.getElementById('gcal-id-inp').value.trim();state.gcalId=id;save();renderGS();addLog(id?'カレンダーIDを保存しました: '+id:'クリアしました');}
 function addLog(msg){const el=document.getElementById('sync-log');const t=new Date().toLocaleTimeString('ja-JP');const line=document.createElement('div');line.textContent=t+' — '+msg;if(el.querySelector('span'))el.innerHTML='';el.insertBefore(line,el.firstChild);}
 function toggleAutoLoad(){state.autoLoad=document.getElementById('auto-load-chk').checked;save();addLog(state.autoLoad?'自動読み込みON':'自動読み込みOFF');}
