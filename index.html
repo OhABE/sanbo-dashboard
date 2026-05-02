@@ -545,7 +545,16 @@ const def={
 };
 let state;
 function load(){try{const r=localStorage.getItem(KEY);state=r?JSON.parse(r):JSON.parse(JSON.stringify(def));}catch(e){state=JSON.parse(JSON.stringify(def));}}
-function save(){try{localStorage.setItem(KEY,JSON.stringify(state));}catch(e){}}
+let _saveTimer=null;
+function save(){
+  try{localStorage.setItem(KEY,JSON.stringify(state));}catch(e){}
+  if(!state.gsUrl)return;
+  clearTimeout(_saveTimer);
+  _saveTimer=setTimeout(()=>{
+    const data={type:'all',timestamp:new Date().toISOString(),sky:state.sky,kifune:state.kifune,mkt:state.mkt,research:state.research,org:state.org,events:state.events,gcalEvents:state.gcalEvents||[],reminders:state.reminders,orders:state.orders,knownCustomers:state.knownCustomers,knownProducts:state.knownProducts};
+    fetch(state.gsUrl,{method:'POST',body:JSON.stringify(data)}).catch(()=>{});
+  },2000);
+}
 
 const stageLabel={'s-idea':'企画中','s-shoot':'撮影待ち','s-edit':'編集中','s-done':'完成'};
 const secLabel={sky:'SkyStage',kifune:'キフネ',mkt:'マーケ',research:'市場調査',strategy:'営業部長'};
@@ -1122,7 +1131,7 @@ const _gk=getGeminiKey();
 document.getElementById('gemini-key-status').textContent=_gk?'設定済み（'+_gk.slice(0,10)+'...）':'未設定';
 document.getElementById('gemini-key-status').className='gs-status '+(_gk?'gs-ok':'');
 updateDatalist('dl-products',state.knownProducts||[]);
-if(state.autoLoad&&state.gsUrl){addLog('自動読み込みを開始...');loadFromSheet();}
+if(state.gsUrl){addLog('シートからデータを読み込み中...');loadFromSheet();}
 if(state.gsUrl){syncGCal();setInterval(syncGCal,30*60*1000);}
 document.getElementById('ai-sky-auto-inp').value=getAutoPrompt('sky');
 document.getElementById('ai-kifune-auto-inp').value=getAutoPrompt('kifune');
