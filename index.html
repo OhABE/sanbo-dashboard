@@ -496,11 +496,11 @@ body{background:var(--bg);color:var(--text);font-family:var(--font);font-size:14
       <div class="gs-status" id="gs-status">URLが未設定です</div>
     </div>
     <div class="card">
-      <div class="card-head"><span class="card-title">Googleカレンダー連携</span><span class="badge bg">GASなし・直接連携</span></div>
-      <div class="desc">① <a href="https://calendar.google.com/calendar/r/settings" target="_blank" style="color:#1565C0">Googleカレンダー設定</a> を開く<br>② 左パネルで連携したいカレンダーを選択<br>③「カレンダーの統合」→「iCal形式の非公開アドレス」をコピー<br>④ 下の欄にペーストして保存</div>
-      <input class="gs-url-inp" id="gcal-ics-inp" placeholder="https://calendar.google.com/calendar/ical/...">
-      <button class="notif-btn" style="margin-bottom:8px" onclick="saveGCalIcsUrl()">ICS URLを保存</button>
-      <div class="gs-status" id="gcal-status">未設定</div>
+      <div class="card-head"><span class="card-title">Googleカレンダー連携</span></div>
+      <div class="desc" style="margin-bottom:10px">上の「Apps Script URL」と同じURLを使います。GASが未設定の場合は先にURLを設定してください。<br><br>【GAS初回設定手順】<br>① <a href="https://sheets.new" target="_blank" style="color:#1565C0">sheets.new</a> で新しいスプレッドシートを作成<br>② メニュー「拡張機能」→「Apps Script」<br>③ エディタの中身を全部削除 → <code>google-apps-script.js</code> の内容をコピペ → 保存（Ctrl+S）<br>④「デプロイ」→「新しいデプロイ」→ 種類：ウェブアプリ、実行者：自分、アクセス：全員 → デプロイ<br>⑤ Googleへのアクセス許可を求められたら「許可」（カレンダー含む）<br>⑥ 表示されたURLを上の「Apps Script URL」欄にコピペして保存</div>
+      <div class="gs-status" id="gcal-status" style="margin-bottom:8px">未設定</div>
+      <input class="gs-url-inp" id="gcal-id-inp" placeholder="カレンダーID（省略時はprimary）">
+      <button class="notif-btn" style="margin-bottom:4px" onclick="saveGCalId()">カレンダーIDを保存（任意）</button>
     </div>
     <div class="card">
       <div class="card-head"><span class="card-title">データを受信</span></div>
@@ -541,7 +541,7 @@ const def={
   reminders:[{title:'動画編集チェック',time:'09:00',sec:'sky'},{title:'SNS投稿タイム',time:'12:00',sec:'sky'}],
   orders:[],
   knownCustomers:[],knownProducts:[],
-  gsUrl:'',gcalIcsUrl:'',autoLoad:false
+  gsUrl:'',gcalId:'',autoLoad:false
 };
 let state;
 function load(){try{const r=localStorage.getItem(KEY);state=r?JSON.parse(r):JSON.parse(JSON.stringify(def));}catch(e){state=JSON.parse(JSON.stringify(def));}}
@@ -644,19 +644,21 @@ function changeMonth(d){calM+=d;if(calM<0){calM=11;calY--;}if(calM>11){calM=0;ca
 function addEvent(){const t=document.getElementById('ev-title-inp').value.trim();const d=document.getElementById('ev-date-inp').value;const s=document.getElementById('ev-sec-inp').value;if(!t||!d)return;state.events.push({title:t,date:d,sec:s});document.getElementById('ev-title-inp').value='';save();renderCal();}
 function delEvent(date,title){state.events=state.events.filter(e=>!(e.date===date&&e.title===title));save();renderCal();}
 async function syncGCal(){
-  if(!state.gcalIcsUrl){alert('シート連携タブでGoogleカレンダーのICS URLを設定してください');return;}
+  if(!state.gsUrl){alert('シート連携タブでApps Script URLを設定してください');return;}
   const btn=document.getElementById('gcal-btn');btn.textContent='同期中...';
   try{
-    const proxy='https://api.allorigins.win/raw?url='+encodeURIComponent(state.gcalIcsUrl);
-    const res=await fetch(proxy);
+    const res=await fetch(state.gsUrl+'?action=gcal&calId='+encodeURIComponent(state.gcalId||'primary'),{redirect:'follow'});
     if(!res.ok){btn.textContent='通信エラー: HTTP '+res.status+' — 再試行 ↻';return;}
-    const text=await res.text();
-    if(!text.includes('BEGIN:VCALENDAR')){btn.textContent='ICSデータが不正です — 再試行 ↻';return;}
-    const events=parseICS(text);
-    state.gcalEvents=events;
-    save();renderCal();
-    btn.textContent='同期完了 ✓ ('+events.length+'件) — 再同期する ↻';
-    setTimeout(()=>{btn.textContent='Googleカレンダーと同期する ↻';},5000);
+    const data=await res.json();
+    if(data.error){btn.textContent='GASエラー: '+data.error+' — 再試行 ↻';return;}
+    if(data.events){
+      state.gcalEvents=data.events.map(e=>({title:e.title,date:e.date,sec:'gcal'}));
+      save();renderCal();
+      btn.textContent='同期完了 ✓ ('+data.events.length+'件) — 再同期する ↻';
+      setTimeout(()=>{btn.textContent='Googleカレンダーと同期する ↻';},5000);
+    }else{
+      btn.textContent='取得できませんでした — 再試行 ↻';
+    }
   }catch(e){
     btn.textContent='同期失敗: '+e.message+' — 再試行 ↻';
   }
@@ -683,37 +685,13 @@ function renderGS(){
   const url=state.gsUrl||'';document.getElementById('gs-url-inp').value=url;
   document.getElementById('gs-status').textContent=url?'設定済み: '+url.slice(0,50)+'...':'URLが未設定です';
   document.getElementById('gs-status').className='gs-status '+(url?'gs-ok':'');
-  const ics=state.gcalIcsUrl||'';document.getElementById('gcal-ics-inp').value=ics;
-  document.getElementById('gcal-status').textContent=ics?'設定済み ✓':'未設定';
-  document.getElementById('gcal-status').className='gs-status '+(ics?'gs-ok':'');
+  const gid=state.gcalId||'';document.getElementById('gcal-id-inp').value=gid;
+  document.getElementById('gcal-status').textContent=url?(gid?'設定済み: '+gid:'GAS設定済み — カレンダーIDは省略可'):'GAS URLを先に設定してください';
+  document.getElementById('gcal-status').className='gs-status '+(url?'gs-ok':'');
   document.getElementById('auto-load-chk').checked=!!state.autoLoad;
 }
 function saveGsUrl(){const url=document.getElementById('gs-url-inp').value.trim();state.gsUrl=url;save();renderGS();addLog(url?'Apps Script URLを保存しました':'URLをクリアしました');}
-function saveGCalIcsUrl(){const url=document.getElementById('gcal-ics-inp').value.trim();state.gcalIcsUrl=url;save();renderGS();addLog(url?'カレンダーICS URLを保存しました':'クリアしました');}
-function parseICS(text){
-  const unfolded=text.replace(/\r\n/g,'\n').replace(/\r/g,'\n').replace(/\n[ \t]/g,'');
-  const lines=unfolded.split('\n');
-  const events=[];let ev=null;
-  const todayStr=now.toISOString().slice(0,10);
-  const future=new Date(now);future.setMonth(future.getMonth()+3);
-  const futureStr=future.toISOString().slice(0,10);
-  for(const line of lines){
-    if(line==='BEGIN:VEVENT'){ev={};continue;}
-    if(line==='END:VEVENT'){
-      if(ev&&ev.title&&ev.date&&ev.date>=todayStr&&ev.date<=futureStr)events.push({title:ev.title,date:ev.date,sec:'gcal'});
-      ev=null;continue;
-    }
-    if(!ev)continue;
-    const ci=line.indexOf(':');if(ci<0)continue;
-    const k=line.slice(0,ci).toUpperCase();const v=line.slice(ci+1);
-    if(k==='SUMMARY'||k.startsWith('SUMMARY;')){ev.title=v;}
-    if(k==='DTSTART'||k.startsWith('DTSTART;')){
-      const d=k.includes('VALUE=DATE')?v:v.replace(/T.*/,'');
-      if(d.length>=8)ev.date=d.slice(0,4)+'-'+d.slice(4,6)+'-'+d.slice(6,8);
-    }
-  }
-  return events;
-}
+function saveGCalId(){const id=document.getElementById('gcal-id-inp').value.trim();state.gcalId=id;save();renderGS();addLog(id?'カレンダーIDを保存しました: '+id:'クリアしました');}
 function addLog(msg){const el=document.getElementById('sync-log');const t=new Date().toLocaleTimeString('ja-JP');const line=document.createElement('div');line.textContent=t+' — '+msg;if(el.querySelector('span'))el.innerHTML='';el.insertBefore(line,el.firstChild);}
 function toggleAutoLoad(){state.autoLoad=document.getElementById('auto-load-chk').checked;save();addLog(state.autoLoad?'自動読み込みON':'自動読み込みOFF');}
 async function loadFromSheet(){
