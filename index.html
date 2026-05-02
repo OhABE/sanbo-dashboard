@@ -1038,10 +1038,12 @@ async function askAdvisor(sec,preset){
     saveAiHistory();
     aiDiv.scrollIntoView({behavior:'smooth',block:'start'});
   }catch(e){
-    const m=e.message.match(/retry in ([\d.]+)s/i);
+    const msm=e.message.match(/retry in ([\d.]+)ms/i);
+    const sm=!msm&&e.message.match(/retry in ([\d.]+)s/i);
+    const m=msm||sm;
     if(m){
       aiHistories[sec].pop();
-      let secs=Math.ceil(parseFloat(m[1]))+1;
+      let secs=msm?1:Math.ceil(parseFloat(sm[1]))+1;
       loadDiv.textContent=`上限到達。${secs}秒後に自動リトライします...`;
       const t=setInterval(()=>{
         secs--;
