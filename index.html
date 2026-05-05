@@ -192,7 +192,7 @@ body{background:var(--bg);color:var(--text);font-family:var(--font);font-size:14
 </head>
 <body>
 <div class="header">
-  <h1>Oh!ダッシュボード <span style="font-size:11px;font-weight:400;color:#999">v0505c</span></h1>
+  <h1>Oh!ダッシュボード <span style="font-size:11px;font-weight:400;color:#999">v0505d</span></h1>
   <p id="today-label"></p>
 </div>
 <div class="tabbar">
@@ -540,6 +540,7 @@ body{background:var(--bg);color:var(--text);font-family:var(--font);font-size:14
 <script>
 const KEY='sanbo_v1';
 const now=new Date();
+function localDateStr(d){return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');}
 document.getElementById('today-label').textContent=now.getFullYear()+'年'+(now.getMonth()+1)+'月'+now.getDate()+'日（'+['日','月','火','水','木','金','土'][now.getDay()]+'）';
 
 // ===== State =====
@@ -616,7 +617,7 @@ function renderOrg(){
 function gcalUrl(title,date){
   const d=date.replace(/-/g,'');
   const next=new Date(date);next.setDate(next.getDate()+1);
-  const d2=next.toISOString().slice(0,10).replace(/-/g,'');
+  const d2=localDateStr(next).replace(/-/g,'');
   return `https://calendar.google.com/calendar/render?action=TEMPLATE&text=${encodeURIComponent(title)}&dates=${d}/${d2}`;
 }
 function renderTodos(elId,todos,sec,key){
@@ -658,7 +659,7 @@ function renderCal(){
   }
   const total=first+days;const rem2=total%7===0?0:7-(total%7);
   for(let i=1;i<=rem2;i++){const d=document.createElement('div');d.className='cal-day other';d.innerHTML=`<div class="cal-num">${i}</div>`;grid.appendChild(d);}
-  const todayStr=now.toISOString().slice(0,10);
+  const todayStr=localDateStr(now);
   const up=allEvents().filter(e=>e.date>=todayStr).slice(0,6);
   const ul=document.getElementById('upcoming-list');ul.innerHTML='';
   if(!up.length){ul.innerHTML='<div style="font-size:12px;color:var(--text3);font-style:italic;padding:8px 0">予定がありません</div>';return;}
@@ -874,7 +875,7 @@ function renderHome(){
   document.getElementById('home-greeting').textContent=greet+'、安部さん';
   document.getElementById('home-date').textContent=now.getFullYear()+'年'+(now.getMonth()+1)+'月'+now.getDate()+'日（'+['日','月','火','水','木','金','土'][now.getDay()]+'）';
   // 今日の予定
-  const todayStr=now.toISOString().slice(0,10);
+  const todayStr=localDateStr(now);
   const todayEvs=allEvents().filter(e=>e.date===todayStr);
   const evEl=document.getElementById('home-events');
   if(!todayEvs.length){evEl.innerHTML='<div class="home-empty">今日の予定はありません</div>';}
@@ -1051,7 +1052,7 @@ function generateBookmarkUrl(){
   inp.scrollIntoView({behavior:'smooth'});
 }
 function buildContext(sec){
-  const todayStr=now.toISOString().slice(0,10);
+  const todayStr=localDateStr(now);
   const upcoming=(state.events||[]).filter(e=>e.date>=todayStr).slice(0,5).map(e=>e.date+' '+e.title).join('、')||'なし';
   if(sec==='sky'){
     const todos=(state.sky.todos||[]).filter(t=>!t.done).map(t=>t.text+(t.date?' ('+t.date+')':'')).join('、')||'なし';
@@ -1117,7 +1118,7 @@ async function askAdvisor(sec,preset){
 
 // ===== Tab / Subtab =====
 function canAutoFire(sec){
-  const today=now.toISOString().slice(0,10);
+  const today=localDateStr(now);
   const key='sanbo_ai_autofire_'+sec;
   if(localStorage.getItem(key)===today)return false;
   localStorage.setItem(key,today);
@@ -1160,7 +1161,7 @@ function addOrgTodo(){const inp=document.getElementById('org-todo-inp');const v=
 
 // ===== Init =====
 function renderCalBar(){
-  const todayStr=now.toISOString().slice(0,10);
+  const todayStr=localDateStr(now);
   document.getElementById('cal-bar-date').textContent=(now.getMonth()+1)+'/'+now.getDate()+'（'+['日','月','火','水','木','金','土'][now.getDay()]+'）';
   const upcoming=allEvents().filter(e=>e.date>=todayStr).slice(0,3);
   const el=document.getElementById('cal-bar-events');
