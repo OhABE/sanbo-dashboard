@@ -192,7 +192,7 @@ body{background:var(--bg);color:var(--text);font-family:var(--font);font-size:14
 </head>
 <body>
 <div class="header">
-  <h1>Oh!ダッシュボード <span style="font-size:11px;font-weight:400;color:#999">v0505e</span></h1>
+  <h1>Oh!ダッシュボード <span style="font-size:11px;font-weight:400;color:#999">v0505f</span></h1>
   <p id="today-label"></p>
 </div>
 <div class="tabbar">
@@ -1186,12 +1186,14 @@ document.getElementById('ai-sky-auto-inp').value=getAutoPrompt('sky');
 document.getElementById('ai-kifune-auto-inp').value=getAutoPrompt('kifune');
 loadAiHistory();renderAiHistory('sky');renderAiHistory('kifune');renderAiHistory('mkt');renderAiHistory('strategy');
 checkWeeklySummary();
-// ページロード時に自動アドバイス送信（履歴が空のセクションのみ）
+// ページロード時に自動アドバイス送信（1日1回）
 if(getGeminiKey()){
+  const _today=localDateStr(now);
   let _delay=0;
   ['sky','kifune'].forEach(sec=>{
-    if(!aiHistories[sec]||aiHistories[sec].length===0){
-      setTimeout(()=>askAdvisor(sec,getAutoPrompt(sec)),_delay);
+    const _k='sanbo_auto_sent_'+sec;
+    if(localStorage.getItem(_k)!==_today){
+      setTimeout(()=>{askAdvisor(sec,getAutoPrompt(sec));localStorage.setItem(_k,_today);},_delay);
       _delay+=800;
     }
   });
