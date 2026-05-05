@@ -192,7 +192,7 @@ body{background:var(--bg);color:var(--text);font-family:var(--font);font-size:14
 </head>
 <body>
 <div class="header">
-  <h1>Oh!ダッシュボード <span style="font-size:11px;font-weight:400;color:#999">v0505</span></h1>
+  <h1>Oh!ダッシュボード <span style="font-size:11px;font-weight:400;color:#999">v0505b</span></h1>
   <p id="today-label"></p>
 </div>
 <div class="tabbar">
@@ -1068,15 +1068,15 @@ const aiSysPrompts={
   mkt:`あなたは安部さん専属のYouTubeマーケ・調査アドバイザーです。「SkyStage」（バイク・マラソン・祭りジャンル、北九州市）のチャンネル成長を支援。マーケティング施策・競合調査・トレンド分析が専門。具体的で実践的なアドバイスを自然な文章で3〜4文にまとめてください。箇条書き・ヘッダー・前置き挨拶は不要。`,
   strategy:`あなたは安部さん専属の営業戦略アドバイザーです。北九州市若松区のキフネ社で営業部長を務める安部さんの経営・組織・戦略を支援。部下育成・売上戦略・中期計画が専門。ダッシュボードの現状を踏まえ、営業部長視点の戦略的な洞察を自然な文章で3〜4文にまとめてください。箇条書き・ヘッダー・前置き挨拶は不要。`
 };
-let _aiInFlight=false;
-async function askAdvisor(sec,preset,_retry=0){
-  if(_aiInFlight)return;
-  _aiInFlight=true;
+const _aiInFlight={};
+async function askAdvisor(sec,preset){
+  if(_aiInFlight[sec])return;
+  _aiInFlight[sec]=true;
   const apiKey=getGeminiKey();
   const msgEl=document.getElementById('ai-'+sec+'-msgs');
-  if(!apiKey){msgEl.innerHTML='<div class="ai-msg-loading">APIキーが未設定です。「シート連携」タブ上部で設定してください。</div>';_aiInFlight=false;return;}
+  if(!apiKey){msgEl.innerHTML='<div class="ai-msg-loading">APIキーが未設定です。「シート連携」タブ上部で設定してください。</div>';_aiInFlight[sec]=false;return;}
   const inp=document.getElementById('ai-'+sec+'-inp');
-  const q=preset||inp.value.trim();if(!q){_aiInFlight=false;return;}inp.value='';
+  const q=preset||inp.value.trim();if(!q){_aiInFlight[sec]=false;return;}inp.value='';
   if(!aiHistories[sec])aiHistories[sec]=[];
   aiHistories[sec].push({role:'user',parts:[{text:q}]});
   if(aiHistories[sec].length>20)aiHistories[sec]=aiHistories[sec].slice(-20);
@@ -1103,21 +1103,11 @@ async function askAdvisor(sec,preset,_retry=0){
     if(aiHistories[sec].length>20)aiHistories[sec]=aiHistories[sec].slice(-20);
     saveAiHistory();
     aiDiv.scrollIntoView({behavior:'smooth',block:'start'});
-    _aiInFlight=false;
   }catch(e){
-    const msm=e.message.match(/retry in ([\d.]+)ms/i);
-    const sm=!msm&&e.message.match(/retry in ([\d.]+)s/i);
-    const m=msm||sm;
-    if(m&&_retry<3){
-      aiHistories[sec].pop();
-      let secs=msm?5:Math.ceil(parseFloat(sm[1]))+1;
-      loadDiv.textContent=`上限到達。${secs}秒後に自動リトライします... (${_retry+1}/3)`;
-      const t=setInterval(()=>{
-        secs--;
-        if(secs<=0){clearInterval(t);userDiv.remove();loadDiv.remove();_aiInFlight=false;askAdvisor(sec,q,_retry+1);}
-        else loadDiv.textContent=`上限到達。${secs}秒後に自動リトライします... (${_retry+1}/3)`;
-      },1000);
-    }else{_aiInFlight=false;loadDiv.textContent='エラー: '+e.message;}
+    aiHistories[sec].pop();
+    loadDiv.textContent='エラー: '+e.message;
+  }finally{
+    _aiInFlight[sec]=false;
   }
 }
 
