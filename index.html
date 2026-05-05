@@ -192,7 +192,7 @@ body{background:var(--bg);color:var(--text);font-family:var(--font);font-size:14
 </head>
 <body>
 <div class="header">
-  <h1>Oh!ダッシュボード</h1>
+  <h1>Oh!ダッシュボード <span style="font-size:11px;font-weight:400;color:#999">v0505</span></h1>
   <p id="today-label"></p>
 </div>
 <div class="tabbar">
@@ -486,8 +486,12 @@ body{background:var(--bg);color:var(--text);font-family:var(--font);font-size:14
       <div style="display:flex;gap:6px;margin-bottom:8px">
         <input class="gs-url-inp" id="gemini-key-inp" type="text" placeholder="AIzaSy..." style="margin-bottom:0;flex:1;font-family:monospace;font-size:12px">
       </div>
-      <button class="notif-btn" style="margin-bottom:8px" onclick="saveGeminiKey()">APIキーを保存</button>
+      <div style="display:flex;gap:6px;margin-bottom:8px">
+        <button class="notif-btn" style="margin-bottom:0;flex:1" onclick="saveGeminiKey()">APIキーを保存</button>
+        <button style="font-size:12px;padding:0 12px;border:1px solid var(--border2);border-radius:8px;background:var(--bg2);color:var(--text);cursor:pointer;white-space:nowrap;font-family:var(--font)" onclick="testGeminiKey()">接続テスト</button>
+      </div>
       <div class="gs-status" id="gemini-key-status">未設定</div>
+      <div id="gemini-test-result" style="font-size:11px;margin-top:6px;padding:8px;border-radius:6px;display:none;word-break:break-all;line-height:1.5"></div>
       <div class="desc" style="margin-top:4px">① <a href="https://aistudio.google.com/apikey" target="_blank" style="color:#1565C0">aistudio.google.com/apikey</a> でキーをコピー　② 上の欄に長押しでペースト　③ 保存ボタンをタップ</div>
     </div>
     <div class="card" style="background:#EEF4FF;border-color:#B3C8F0">
@@ -1010,6 +1014,29 @@ function saveGeminiKey(){
   document.getElementById('gemini-key-status').textContent=v?'設定済み（'+v.slice(0,10)+'...）':'クリアしました';
   document.getElementById('gemini-key-status').className='gs-status '+(v?'gs-ok':'');
   document.getElementById('gemini-key-inp').value='';
+}
+async function testGeminiKey(){
+  const box=document.getElementById('gemini-test-result');
+  const key=getGeminiKey();
+  if(!key){box.style.display='block';box.style.background='#FEE';box.style.color='#c00';box.textContent='APIキーが未設定です';return;}
+  box.style.display='block';box.style.background='#f5f5f5';box.style.color='#555';box.textContent='テスト中...';
+  try{
+    const res=await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash-lite:generateContent?key=${key}`,{
+      method:'POST',headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({contents:[{role:'user',parts:[{text:'hi'}]}],generationConfig:{maxOutputTokens:10}})
+    });
+    const data=await res.json();
+    if(data.error){
+      box.style.background='#FEE';box.style.color='#c00';
+      box.textContent='❌ エラー ('+res.status+'): '+data.error.message;
+    }else{
+      box.style.background='#E8F5E9';box.style.color='#1B5E20';
+      box.textContent='✅ 接続成功！AIアドバイザーが使えます。';
+    }
+  }catch(e){
+    box.style.background='#FEE';box.style.color='#c00';
+    box.textContent='❌ 通信エラー: '+e.message;
+  }
 }
 function generateBookmarkUrl(){
   const key=getGeminiKey();
