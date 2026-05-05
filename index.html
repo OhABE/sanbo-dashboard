@@ -485,11 +485,19 @@ body{background:var(--bg);color:var(--text);font-family:var(--font);font-size:14
       <div class="card-head"><span class="card-title">Gemini APIキー</span><span class="badge bg">AIアドバイザー・無料</span></div>
       <div style="display:flex;gap:6px;margin-bottom:8px">
         <input class="gs-url-inp" id="gemini-key-inp" type="text" placeholder="AIzaSy..." style="margin-bottom:0;flex:1;font-family:monospace;font-size:12px">
-        <button onclick="const i=document.getElementById('gemini-key-inp');i.select();document.execCommand('selectAll')" style="font-size:12px;padding:0 10px;border:1px solid var(--border);border-radius:8px;background:var(--bg2);color:var(--text2);white-space:nowrap;cursor:pointer;font-family:var(--font)">全選択</button>
       </div>
       <button class="notif-btn" style="margin-bottom:8px" onclick="saveGeminiKey()">APIキーを保存</button>
       <div class="gs-status" id="gemini-key-status">未設定</div>
       <div class="desc" style="margin-top:4px">① <a href="https://aistudio.google.com/apikey" target="_blank" style="color:#1565C0">aistudio.google.com/apikey</a> でキーをコピー　② 上の欄に長押しでペースト　③ 保存ボタンをタップ</div>
+    </div>
+    <div class="card" style="background:#EEF4FF;border-color:#B3C8F0">
+      <div class="card-head"><span class="card-title">📱 スマホ用ブックマークURL</span></div>
+      <div class="desc" style="margin-bottom:10px">APIキーを保存後、このボタンを押すとキー入り専用URLが生成されます。そのURLをスマホChromeで開いてブックマーク登録すれば、次回から入力不要です。</div>
+      <button class="notif-btn" onclick="generateBookmarkUrl()">URLを生成してコピー</button>
+      <div id="bookmark-url-box" style="display:none;margin-top:10px">
+        <div style="font-size:11px;color:#1565C0;margin-bottom:5px">↓ このURLをスマホのChromeで開いてブックマーク登録してください</div>
+        <input id="bookmark-url-inp" class="gs-url-inp" readonly style="font-size:11px;margin-bottom:0;font-family:monospace;background:#fff">
+      </div>
     </div>
     <div class="info-box">Apps ScriptのURLを設定すると、データをGoogleスプレッドシートに送受信してマルチデバイス対応できます。</div>
     <div class="card">
@@ -992,13 +1000,27 @@ function saveAutoPrompt(sec){
   const btn=document.querySelector('#ai-'+sec+'-auto-inp').nextElementSibling;
   btn.textContent='保存済 ✓';setTimeout(()=>btn.textContent='保存',1500);
 }
-function getGeminiKey(){return state.geminiKey||localStorage.getItem('sanbo_gemini_key')||'';}
+function getGeminiKey(){
+  try{const m=location.hash.match(/[#&]gemini=([^&]+)/);if(m)return decodeURIComponent(m[1]);}catch(e){}
+  return state.geminiKey||localStorage.getItem('sanbo_gemini_key')||'';
+}
 function saveGeminiKey(){
   const v=document.getElementById('gemini-key-inp').value.trim();
   state.geminiKey=v;save();
   document.getElementById('gemini-key-status').textContent=v?'設定済み（'+v.slice(0,10)+'...）':'クリアしました';
   document.getElementById('gemini-key-status').className='gs-status '+(v?'gs-ok':'');
   document.getElementById('gemini-key-inp').value='';
+}
+function generateBookmarkUrl(){
+  const key=getGeminiKey();
+  if(!key){alert('先にAPIキーを入力して保存してください');return;}
+  const url=location.href.split('#')[0]+'#gemini='+encodeURIComponent(key);
+  const inp=document.getElementById('bookmark-url-inp');
+  inp.value=url;
+  document.getElementById('bookmark-url-box').style.display='block';
+  inp.select();
+  navigator.clipboard.writeText(url).catch(()=>{});
+  inp.scrollIntoView({behavior:'smooth'});
 }
 function buildContext(sec){
   const todayStr=now.toISOString().slice(0,10);
@@ -1035,7 +1057,7 @@ async function askAdvisor(sec,preset,_retry=0){
   const loadDiv=document.createElement('div');loadDiv.className='ai-msg-loading';loadDiv.textContent='考え中...';msgEl.appendChild(loadDiv);
   userDiv.scrollIntoView({behavior:'smooth',block:'start'});
   try{
-    const res=await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKey}`,{
+    const res=await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash-lite:generateContent?key=${apiKey}`,{
       method:'POST',headers:{'Content-Type':'application/json'},
       body:JSON.stringify({
         system_instruction:{parts:[{text:aiSysPrompts[sec]+'\n\n'+buildContext(sec)}]},
@@ -1068,7 +1090,7 @@ async function askAdvisor(sec,preset,_retry=0){
         if(secs<=0){clearInterval(t);userDiv.remove();loadDiv.remove();_aiInFlight=false;askAdvisor(sec,q,_retry+1);}
         else loadDiv.textContent=`上限到達。${secs}秒後に自動リトライします... (${_retry+1}/3)`;
       },1000);
-    }else{_aiInFlight=false;loadDiv.textContent=m?'上限エラーが続いています。しばらく時間をおいてから試してください。':'エラー: '+e.message;}
+    }else{_aiInFlight=false;loadDiv.textContent='エラー: '+e.message;}
   }
 }
 
