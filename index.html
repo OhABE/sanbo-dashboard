@@ -212,7 +212,7 @@ body{background:var(--bg);color:var(--text);font-family:var(--font);font-size:14
 </head>
 <body>
 <div class="header">
-  <h1>Oh!ダッシュボード <span style="font-size:11px;font-weight:400;color:#999">v0505h</span></h1>
+  <h1>Oh!ダッシュボード <span style="font-size:11px;font-weight:400;color:#999">v0505i</span></h1>
   <p id="today-label"></p>
 </div>
 <div class="tabbar">
@@ -237,7 +237,7 @@ body{background:var(--bg);color:var(--text);font-family:var(--font);font-size:14
       <span class="mic-hint">お客様名 → 商品名 → 個数 の順に話してください</span>
     </button>
     <div class="card">
-      <div class="card-head"><span class="card-title">今日の予定</span></div>
+      <div class="card-head"><span class="card-title">今日・今後7日間の予定</span></div>
       <div id="home-events"></div>
     </div>
     <div class="card">
@@ -894,12 +894,23 @@ function renderHome(){
   const greet=h<5?'お疲れ様です':h<12?'おはようございます':h<18?'こんにちは':'こんばんは';
   document.getElementById('home-greeting').textContent=greet+'、安部さん';
   document.getElementById('home-date').textContent=now.getFullYear()+'年'+(now.getMonth()+1)+'月'+now.getDate()+'日（'+['日','月','火','水','木','金','土'][now.getDay()]+'）';
-  // 今日の予定
+  // 今日・今後7日間の予定
   const todayStr=localDateStr(now);
-  const todayEvs=allEvents().filter(e=>e.date===todayStr);
+  const weekEnd=new Date(now.getFullYear(),now.getMonth(),now.getDate()+6);
+  const weekEndStr=localDateStr(weekEnd);
+  const weekEvs=allEvents().filter(e=>e.date>=todayStr&&e.date<=weekEndStr);
+  const byDate={};
+  weekEvs.forEach(e=>{if(!byDate[e.date])byDate[e.date]=[];byDate[e.date].push(e);});
+  const DOW=['日','月','火','水','木','金','土'];
   const evEl=document.getElementById('home-events');
-  if(!todayEvs.length){evEl.innerHTML='<div class="home-empty">今日の予定はありません</div>';}
-  else{evEl.innerHTML=todayEvs.map(e=>`<div class="home-row"><div class="home-dot" style="background:${e.sec==='kifune'?'var(--kifune)':'var(--sky)'}"></div><span class="home-val">${e.title}</span></div>`).join('');}
+  if(!weekEvs.length){evEl.innerHTML='<div class="home-empty">今後7日間の予定はありません</div>';}
+  else{evEl.innerHTML=Object.keys(byDate).sort().map(ds=>{
+    const p=ds.split('-');const d=new Date(+p[0],+p[1]-1,+p[2]);
+    const isToday=ds===todayStr;
+    const label=isToday?'今日（'+DOW[d.getDay()]+'）':`${+p[1]}/${+p[2]}（${DOW[d.getDay()]}）`;
+    const rows=byDate[ds].map(e=>`<div class="home-row"><div class="home-dot" style="background:${e.sec==='kifune'?'var(--kifune)':'var(--sky)'}"></div><span class="home-val">${e.title}</span></div>`).join('');
+    return `<div style="margin-bottom:8px"><div style="font-size:11px;font-weight:700;padding:3px 0 4px;border-bottom:1px solid var(--border);margin-bottom:4px;color:${isToday?'var(--sky)':'var(--text2)'}">${label}</div>${rows}</div>`;
+  }).join('');}
   // SkyStage TODO
   const skyPending=(state.sky.todos||[]).filter(t=>!t.done);
   document.getElementById('home-sky-badge').textContent=skyPending.length+'件残';
