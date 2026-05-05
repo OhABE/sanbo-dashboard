@@ -212,7 +212,7 @@ body{background:var(--bg);color:var(--text);font-family:var(--font);font-size:14
 </head>
 <body>
 <div class="header">
-  <h1>Oh!ダッシュボード <span style="font-size:11px;font-weight:400;color:#999">v0505i</span></h1>
+  <h1>Oh!ダッシュボード <span style="font-size:11px;font-weight:400;color:#999">v0505j</span></h1>
   <p id="today-label"></p>
 </div>
 <div class="tabbar">
@@ -1084,15 +1084,31 @@ function generateBookmarkUrl(){
 }
 function buildContext(sec){
   const todayStr=localDateStr(now);
-  const upcoming=(state.events||[]).filter(e=>e.date>=todayStr).slice(0,5).map(e=>e.date+' '+e.title).join('、')||'なし';
+  const upcoming=allEvents().filter(e=>e.date>=todayStr).slice(0,14).map(e=>e.date+' '+e.title+(e.sec?'['+e.sec+']':'')).join('\n')||'なし';
   if(sec==='sky'){
     const todos=(state.sky.todos||[]).filter(t=>!t.done).map(t=>t.text+(t.date?' ('+t.date+')':'')).join('、')||'なし';
-    const pipes=(state.sky.pipes||[]).map(p=>p.title+'('+stageLabel[p.stage]+')').join('、')||'なし';
-    return `【今日】${now.toLocaleDateString('ja-JP')}\n【直近の予定】${upcoming}\n【未完了TODO】${todos}\n【動画パイプライン】${pipes}`;
+    const pipes=(state.sky.pipes||[]).map(p=>p.title+'('+stageLabel[p.stage]+(p.date?' '+p.date:'')+')').join('、')||'なし';
+    const ideas=(state.sky.videoIdeas||[]).slice(0,10).map(v=>v.text).join('、')||'なし';
+    const mktIdeas=(state.mkt.ideas||[]).slice(0,5).map(v=>v.text).join('、')||'なし';
+    const notes=(state.research.notes||[]).slice(0,5).map(v=>v.text).join('、')||'なし';
+    return `【今日】${now.toLocaleDateString('ja-JP')}\n【直近の予定（2週間）】\n${upcoming}\n【未完了TODO】${todos}\n【動画パイプライン】${pipes}\n【動画アイデア】${ideas}\n【マーケアイデア】${mktIdeas}\n【調査メモ】${notes}`;
+  }else if(sec==='kifune'){
+    const todos=(state.kifune.todos||[]).filter(t=>!t.done).map(t=>t.text+(t.date?' ('+t.date+')':'')).join('、')||'なし';
+    const goals=(state.kifune.goals||[]).filter(g=>!g.done).map(g=>g.text).join('、')||'なし';
+    const orders=(state.orders||[]).slice(0,5).map(o=>(o.customer||'?')+' '+(o.product||'?')+' '+(o.qty||'')).join('、')||'なし';
+    return `【今日】${now.toLocaleDateString('ja-JP')}\n【直近の予定（2週間）】\n${upcoming}\n【未完了TODO】${todos}\n【目標】${goals}\n【直近の受注】${orders}`;
+  }else if(sec==='mkt'){
+    const todos=(state.mkt.todos||[]).filter(t=>!t.done).map(t=>t.text+(t.date?' ('+t.date+')':'')).join('、')||'なし';
+    const ideas=(state.mkt.ideas||[]).slice(0,10).map(v=>v.text).join('、')||'なし';
+    const notes=(state.research.notes||[]).slice(0,10).map(v=>v.text).join('、')||'なし';
+    const videoIdeas=(state.sky.videoIdeas||[]).slice(0,5).map(v=>v.text).join('、')||'なし';
+    return `【今日】${now.toLocaleDateString('ja-JP')}\n【直近の予定（2週間）】\n${upcoming}\n【未完了TODO】${todos}\n【マーケアイデア】${ideas}\n【調査メモ】${notes}\n【動画アイデア（参考）】${videoIdeas}`;
   }else{
     const todos=(state.kifune.todos||[]).filter(t=>!t.done).map(t=>t.text+(t.date?' ('+t.date+')':'')).join('、')||'なし';
-    const orders=(state.orders||[]).slice(0,3).map(o=>(o.customer||'?')+' '+(o.product||'?')+' '+(o.qty||'')).join('、')||'なし';
-    return `【今日】${now.toLocaleDateString('ja-JP')}\n【直近の予定】${upcoming}\n【未完了TODO】${todos}\n【直近の受注】${orders}`;
+    const goals=(state.kifune.goals||[]).filter(g=>!g.done).map(g=>g.text).join('、')||'なし';
+    const strategies=(state.org.strategies||[]).slice(0,5).map(s=>s.text||s).join('、')||'なし';
+    const orders=(state.orders||[]).slice(0,5).map(o=>(o.customer||'?')+' '+(o.product||'?')+' '+(o.qty||'')).join('、')||'なし';
+    return `【今日】${now.toLocaleDateString('ja-JP')}\n【直近の予定（2週間）】\n${upcoming}\n【未完了TODO】${todos}\n【目標】${goals}\n【戦略メモ】${strategies}\n【直近の受注】${orders}`;
   }
 }
 const aiSysPrompts={
