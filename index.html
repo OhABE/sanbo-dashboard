@@ -192,7 +192,7 @@ body{background:var(--bg);color:var(--text);font-family:var(--font);font-size:14
 </head>
 <body>
 <div class="header">
-  <h1>Oh!ダッシュボード <span style="font-size:11px;font-weight:400;color:#999">v0505b</span></h1>
+  <h1>Oh!ダッシュボード <span style="font-size:11px;font-weight:400;color:#999">v0505c</span></h1>
   <p id="today-label"></p>
 </div>
 <div class="tabbar">
@@ -248,7 +248,7 @@ body{background:var(--bg);color:var(--text);font-family:var(--font);font-size:14
   <div class="main">
     <div id="sky-sub-main" class="subsec active">
       <div class="ai-advisor">
-        <div class="ai-adv-head"><span class="ai-adv-title">🤖 AIアドバイザー</span><div style="display:flex;gap:8px;align-items:center"><button class="ai-reset-btn" onclick="resetAdvisor('sky')">🔄 リセット</button><span style="font-size:10px;color:#4a8af4">Gemini</span></div></div>
+        <div class="ai-adv-head"><span class="ai-adv-title">🤖 AIアドバイザー</span><div style="display:flex;gap:8px;align-items:center"><button class="ai-reset-btn" onclick="resetAdvisor('sky')">🔄 リセット</button><span style="font-size:10px;color:#f55036">Groq</span></div></div>
         <div class="ai-quick">
           <button class="ai-qbtn" onclick="askAdvisor('sky','今日の予定と優先タスクを確認してアドバイスして')">今日の予定</button>
           <button class="ai-qbtn" onclick="askAdvisor('sky','チャンネルの現状を踏まえた改善提案を3つして')">改善提案</button>
@@ -290,7 +290,7 @@ body{background:var(--bg);color:var(--text);font-family:var(--font);font-size:14
     </div>
     <div id="sky-sub-mkt" class="subsec">
       <div class="ai-advisor">
-        <div class="ai-adv-head"><span class="ai-adv-title">🤖 AIアドバイザー</span><div style="display:flex;gap:8px;align-items:center"><button class="ai-reset-btn" onclick="resetAdvisor('mkt')">🔄 リセット</button><span style="font-size:10px;color:#4a8af4">Gemini</span></div></div>
+        <div class="ai-adv-head"><span class="ai-adv-title">🤖 AIアドバイザー</span><div style="display:flex;gap:8px;align-items:center"><button class="ai-reset-btn" onclick="resetAdvisor('mkt')">🔄 リセット</button><span style="font-size:10px;color:#f55036">Groq</span></div></div>
         <div class="ai-quick">
           <button class="ai-qbtn" onclick="askAdvisor('mkt','バイク・マラソン・祭りジャンルの最新トレンドを教えて')">トレンド</button>
           <button class="ai-qbtn" onclick="askAdvisor('mkt','チャンネル成長のためのマーケ施策を提案して')">施策提案</button>
@@ -333,7 +333,7 @@ body{background:var(--bg);color:var(--text);font-family:var(--font);font-size:14
   <div class="main">
     <div id="kifune-sub-ops" class="subsec active">
       <div class="ai-advisor">
-        <div class="ai-adv-head"><span class="ai-adv-title">🤖 AIアドバイザー</span><div style="display:flex;gap:8px;align-items:center"><button class="ai-reset-btn" onclick="resetAdvisor('kifune')">🔄 リセット</button><span style="font-size:10px;color:#4a8af4">Gemini</span></div></div>
+        <div class="ai-adv-head"><span class="ai-adv-title">🤖 AIアドバイザー</span><div style="display:flex;gap:8px;align-items:center"><button class="ai-reset-btn" onclick="resetAdvisor('kifune')">🔄 リセット</button><span style="font-size:10px;color:#f55036">Groq</span></div></div>
         <div class="ai-quick">
           <button class="ai-qbtn" onclick="askAdvisor('kifune','今日の予定と優先タスクを確認してアドバイスして')">今日の予定</button>
           <button class="ai-qbtn" onclick="askAdvisor('kifune','業務の現状を踏まえた改善提案を3つして')">改善提案</button>
@@ -370,7 +370,7 @@ body{background:var(--bg);color:var(--text);font-family:var(--font);font-size:14
     </div>
     <div id="kifune-sub-strategy" class="subsec">
       <div class="ai-advisor">
-        <div class="ai-adv-head"><span class="ai-adv-title">🤖 AIアドバイザー</span><div style="display:flex;gap:8px;align-items:center"><button class="ai-reset-btn" onclick="resetAdvisor('strategy')">🔄 リセット</button><span style="font-size:10px;color:#4a8af4">Gemini</span></div></div>
+        <div class="ai-adv-head"><span class="ai-adv-title">🤖 AIアドバイザー</span><div style="display:flex;gap:8px;align-items:center"><button class="ai-reset-btn" onclick="resetAdvisor('strategy')">🔄 リセット</button><span style="font-size:10px;color:#f55036">Groq</span></div></div>
         <div class="ai-quick">
           <button class="ai-qbtn" onclick="askAdvisor('strategy','チームの現状を踏まえた組織改善提案をして')">組織改善</button>
           <button class="ai-qbtn" onclick="askAdvisor('strategy','営業部長として今月注力すべき戦略的アクションを教えて')">今月の戦略</button>
@@ -482,9 +482,9 @@ body{background:var(--bg);color:var(--text);font-family:var(--font);font-size:14
 <div id="sec-gs" class="section">
   <div class="main">
     <div class="card">
-      <div class="card-head"><span class="card-title">Gemini APIキー</span><span class="badge bg">AIアドバイザー・無料</span></div>
+      <div class="card-head"><span class="card-title">Groq APIキー</span><span class="badge bg">AIアドバイザー・無料</span></div>
       <div style="display:flex;gap:6px;margin-bottom:8px">
-        <input class="gs-url-inp" id="gemini-key-inp" type="text" placeholder="AIzaSy..." style="margin-bottom:0;flex:1;font-family:monospace;font-size:12px">
+        <input class="gs-url-inp" id="gemini-key-inp" type="text" placeholder="gsk_..." style="margin-bottom:0;flex:1;font-family:monospace;font-size:12px">
       </div>
       <div style="display:flex;gap:6px;margin-bottom:8px">
         <button class="notif-btn" style="margin-bottom:0;flex:1" onclick="saveGeminiKey()">APIキーを保存</button>
@@ -492,7 +492,7 @@ body{background:var(--bg);color:var(--text);font-family:var(--font);font-size:14
       </div>
       <div class="gs-status" id="gemini-key-status">未設定</div>
       <div id="gemini-test-result" style="font-size:11px;margin-top:6px;padding:8px;border-radius:6px;display:none;word-break:break-all;line-height:1.5"></div>
-      <div class="desc" style="margin-top:4px">① <a href="https://aistudio.google.com/apikey" target="_blank" style="color:#1565C0">aistudio.google.com/apikey</a> でキーをコピー　② 上の欄に長押しでペースト　③ 保存ボタンをタップ</div>
+      <div class="desc" style="margin-top:4px">① <a href="https://console.groq.com/keys" target="_blank" style="color:#1565C0">console.groq.com/keys</a> でGoogleログイン → APIキーを作成　② 上の欄に長押しでペースト　③ 保存ボタンをタップ</div>
     </div>
     <div class="card" style="background:#EEF4FF;border-color:#B3C8F0">
       <div class="card-head"><span class="card-title">📱 スマホ用ブックマークURL</span></div>
@@ -556,7 +556,7 @@ const def={
   reminders:[{title:'動画編集チェック',time:'09:00',sec:'sky'},{title:'SNS投稿タイム',time:'12:00',sec:'sky'}],
   orders:[],
   knownCustomers:[],knownProducts:[],
-  gsUrl:'',gcalId:'',autoLoad:false,geminiKey:''
+  gsUrl:'',gcalId:'',autoLoad:false,geminiKey:'',groqKey:''
 };
 let state;
 function load(){try{const r=localStorage.getItem(KEY);state=r?JSON.parse(r):JSON.parse(JSON.stringify(def));}catch(e){state=JSON.parse(JSON.stringify(def));}}
@@ -983,9 +983,10 @@ function loadAiHistory(){try{const h=localStorage.getItem('sanbo_ai_hist');if(h)
 function renderAiHistory(sec){
   const msgEl=document.getElementById('ai-'+sec+'-msgs');if(!msgEl)return;msgEl.innerHTML='';
   (aiHistories[sec]||[]).forEach(m=>{
+    if(!m.content)return;
     const div=document.createElement('div');
-    if(m.role==='user'){div.className='ai-msg-user';div.textContent=m.parts[0].text;}
-    else{div.className='ai-msg-ai';const t=m.parts[0].text;div.innerHTML=t.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/\*\*(.+?)\*\*/g,'<strong>$1</strong>').replace(/\*(.+?)\*/g,'<em>$1</em>').replace(/^#{1,3}\s(.+)$/gm,'<strong>$1</strong>').replace(/\n/g,'<br>');}
+    if(m.role==='user'){div.className='ai-msg-user';div.textContent=m.content;}
+    else{div.className='ai-msg-ai';const t=m.content;div.innerHTML=t.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/\*\*(.+?)\*\*/g,'<strong>$1</strong>').replace(/\*(.+?)\*/g,'<em>$1</em>').replace(/^#{1,3}\s(.+)$/gm,'<strong>$1</strong>').replace(/\n/g,'<br>');}
     msgEl.appendChild(div);
   });
 }
@@ -1006,12 +1007,12 @@ function saveAutoPrompt(sec){
 }
 function getGeminiKey(){
   try{const m=location.hash.match(/[#&]gemini=([^&]+)/);if(m)return decodeURIComponent(m[1]);}catch(e){}
-  return state.geminiKey||localStorage.getItem('sanbo_gemini_key')||'';
+  return state.groqKey||state.geminiKey||localStorage.getItem('sanbo_gemini_key')||'';
 }
 function saveGeminiKey(){
   const v=document.getElementById('gemini-key-inp').value.trim();
-  state.geminiKey=v;save();
-  document.getElementById('gemini-key-status').textContent=v?'設定済み（'+v.slice(0,10)+'...）':'クリアしました';
+  state.groqKey=v;save();
+  document.getElementById('gemini-key-status').textContent=v?'設定済み（'+v.slice(0,8)+'...）':'クリアしました';
   document.getElementById('gemini-key-status').className='gs-status '+(v?'gs-ok':'');
   document.getElementById('gemini-key-inp').value='';
 }
@@ -1021,14 +1022,14 @@ async function testGeminiKey(){
   if(!key){box.style.display='block';box.style.background='#FEE';box.style.color='#c00';box.textContent='APIキーが未設定です';return;}
   box.style.display='block';box.style.background='#f5f5f5';box.style.color='#555';box.textContent='テスト中...';
   try{
-    const res=await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash-lite:generateContent?key=${key}`,{
-      method:'POST',headers:{'Content-Type':'application/json'},
-      body:JSON.stringify({contents:[{role:'user',parts:[{text:'hi'}]}],generationConfig:{maxOutputTokens:10}})
+    const res=await fetch('https://api.groq.com/openai/v1/chat/completions',{
+      method:'POST',headers:{'Content-Type':'application/json','Authorization':'Bearer '+key},
+      body:JSON.stringify({model:'llama-3.3-70b-versatile',messages:[{role:'user',content:'hi'}],max_tokens:10})
     });
     const data=await res.json();
     if(data.error){
       box.style.background='#FEE';box.style.color='#c00';
-      box.textContent='❌ エラー ('+res.status+'): '+data.error.message;
+      box.textContent='❌ エラー ('+res.status+'): '+(data.error.message||JSON.stringify(data.error));
     }else{
       box.style.background='#E8F5E9';box.style.color='#1B5E20';
       box.textContent='✅ 接続成功！AIアドバイザーが使えます。';
@@ -1078,28 +1079,31 @@ async function askAdvisor(sec,preset){
   const inp=document.getElementById('ai-'+sec+'-inp');
   const q=preset||inp.value.trim();if(!q){_aiInFlight[sec]=false;return;}inp.value='';
   if(!aiHistories[sec])aiHistories[sec]=[];
-  aiHistories[sec].push({role:'user',parts:[{text:q}]});
+  // 旧Gemini形式(parts)の履歴はクリア
+  if(aiHistories[sec].length&&aiHistories[sec][0].parts)aiHistories[sec]=[];
+  aiHistories[sec].push({role:'user',content:q});
   if(aiHistories[sec].length>20)aiHistories[sec]=aiHistories[sec].slice(-20);
   const userDiv=document.createElement('div');userDiv.className='ai-msg-user';userDiv.textContent=q;msgEl.appendChild(userDiv);
   const loadDiv=document.createElement('div');loadDiv.className='ai-msg-loading';loadDiv.textContent='考え中...';msgEl.appendChild(loadDiv);
   userDiv.scrollIntoView({behavior:'smooth',block:'start'});
   try{
-    const res=await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash-lite:generateContent?key=${apiKey}`,{
-      method:'POST',headers:{'Content-Type':'application/json'},
-      body:JSON.stringify({
-        system_instruction:{parts:[{text:aiSysPrompts[sec]+'\n\n'+buildContext(sec)}]},
-        contents:aiHistories[sec],
-        generationConfig:{maxOutputTokens:2000}
-      })
+    const messages=[
+      {role:'system',content:aiSysPrompts[sec]+'\n\n'+buildContext(sec)},
+      ...aiHistories[sec]
+    ];
+    const res=await fetch('https://api.groq.com/openai/v1/chat/completions',{
+      method:'POST',
+      headers:{'Content-Type':'application/json','Authorization':'Bearer '+apiKey},
+      body:JSON.stringify({model:'llama-3.3-70b-versatile',messages,max_tokens:2000})
     });
     const data=await res.json();
-    if(data.error)throw new Error(data.error.message);
-    const reply=data.candidates[0].content.parts[0].text;
+    if(data.error)throw new Error(data.error.message||JSON.stringify(data.error));
+    const reply=data.choices[0].message.content;
     loadDiv.remove();
     const aiDiv=document.createElement('div');aiDiv.className='ai-msg-ai';
     aiDiv.innerHTML=reply.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/\*\*(.+?)\*\*/g,'<strong>$1</strong>').replace(/\*(.+?)\*/g,'<em>$1</em>').replace(/^#{1,3}\s(.+)$/gm,'<strong>$1</strong>').replace(/\n/g,'<br>');
     msgEl.appendChild(aiDiv);
-    aiHistories[sec].push({role:'model',parts:[{text:reply}]});
+    aiHistories[sec].push({role:'assistant',content:reply});
     if(aiHistories[sec].length>20)aiHistories[sec]=aiHistories[sec].slice(-20);
     saveAiHistory();
     aiDiv.scrollIntoView({behavior:'smooth',block:'start'});
