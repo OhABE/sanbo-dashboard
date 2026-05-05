@@ -188,11 +188,37 @@ body{background:var(--bg);color:var(--text);font-family:var(--font);font-size:14
 .order-edit-btns{display:flex;gap:6px;margin-top:2px}
 .order-edit-btns button{flex:1;font-size:12px;padding:7px;border-radius:7px;cursor:pointer;font-family:var(--font);border:none}
 .ai-reset-btn{font-size:11px;padding:3px 9px;border:1px solid #555;border-radius:12px;background:transparent;color:#aaa;cursor:pointer;font-family:var(--font)}
+/* ===== PC レイアウト ===== */
+@media(min-width:900px){
+  .header{padding:20px 32px 14px;display:flex;align-items:center;gap:16px}
+  .header h1{font-size:22px;margin:0}
+  #today-label{margin:0;font-size:13px}
+  .tabbar{padding:0 24px}
+  .tab{padding:14px 28px;font-size:14px}
+  .subtabbar{padding:0 24px}
+  .main{max-width:1400px;padding:20px 24px 80px;display:grid;grid-template-columns:1fr 1fr;gap:16px;align-items:start}
+  .card{margin-bottom:0}
+  .ai-advisor{grid-column:1/-1}
+  .metrics{grid-column:1/-1;grid-template-columns:repeat(6,1fr)}
+  .info-box{grid-column:1/-1}
+  .add-row{grid-column:1/-1}
+  .pipe-form{grid-column:1/-1}
+  .ev-form{grid-column:1/-1}
+  .remind-form{grid-column:1/-1}
+  .order-form{grid-column:1/-1}
+  .gcal-open-btn{grid-column:1/-1}
+  .gcal-sync-btn{grid-column:1/-1}
+  .cal-nav{grid-column:1/-1}
+  .cal-grid{grid-column:1/-1}
+  .upcoming-list{grid-column:1/-1}
+  .cal-bar{padding:10px 32px}
+  .cal-bar-date{font-size:13px}
+}
 </style>
 </head>
 <body>
 <div class="header">
-  <h1>Oh!ダッシュボード <span style="font-size:11px;font-weight:400;color:#999">v0505f</span></h1>
+  <h1>Oh!ダッシュボード <span style="font-size:11px;font-weight:400;color:#999">v0505g</span></h1>
   <p id="today-label"></p>
 </div>
 <div class="tabbar">
