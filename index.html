@@ -483,10 +483,13 @@ body{background:var(--bg);color:var(--text);font-family:var(--font);font-size:14
   <div class="main">
     <div class="card">
       <div class="card-head"><span class="card-title">Gemini APIキー</span><span class="badge bg">AIアドバイザー・無料</span></div>
-      <input class="gs-url-inp" id="gemini-key-inp" type="password" placeholder="AIzaSy...">
+      <div style="display:flex;gap:6px;margin-bottom:8px">
+        <input class="gs-url-inp" id="gemini-key-inp" type="text" placeholder="AIzaSy..." style="margin-bottom:0;flex:1;font-family:monospace;font-size:12px">
+        <button onclick="const i=document.getElementById('gemini-key-inp');i.select();document.execCommand('selectAll')" style="font-size:12px;padding:0 10px;border:1px solid var(--border);border-radius:8px;background:var(--bg2);color:var(--text2);white-space:nowrap;cursor:pointer;font-family:var(--font)">全選択</button>
+      </div>
       <button class="notif-btn" style="margin-bottom:8px" onclick="saveGeminiKey()">APIキーを保存</button>
       <div class="gs-status" id="gemini-key-status">未設定</div>
-      <div class="desc" style="margin-top:4px">aistudio.google.com で無料取得できます。カード登録不要。</div>
+      <div class="desc" style="margin-top:4px">① <a href="https://aistudio.google.com/apikey" target="_blank" style="color:#1565C0">aistudio.google.com/apikey</a> でキーをコピー　② 上の欄に長押しでペースト　③ 保存ボタンをタップ</div>
     </div>
     <div class="info-box">Apps ScriptのURLを設定すると、データをGoogleスプレッドシートに送受信してマルチデバイス対応できます。</div>
     <div class="card">
