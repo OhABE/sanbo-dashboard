@@ -541,7 +541,7 @@ const def={
   reminders:[{title:'動画編集チェック',time:'09:00',sec:'sky'},{title:'SNS投稿タイム',time:'12:00',sec:'sky'}],
   orders:[],
   knownCustomers:[],knownProducts:[],
-  gsUrl:'',gcalId:'',autoLoad:false
+  gsUrl:'',gcalId:'',autoLoad:false,geminiKey:''
 };
 let state;
 function load(){try{const r=localStorage.getItem(KEY);state=r?JSON.parse(r):JSON.parse(JSON.stringify(def));}catch(e){state=JSON.parse(JSON.stringify(def));}}
@@ -989,10 +989,10 @@ function saveAutoPrompt(sec){
   const btn=document.querySelector('#ai-'+sec+'-auto-inp').nextElementSibling;
   btn.textContent='保存済 ✓';setTimeout(()=>btn.textContent='保存',1500);
 }
-function getGeminiKey(){return localStorage.getItem('sanbo_gemini_key')||'';}
+function getGeminiKey(){return state.geminiKey||localStorage.getItem('sanbo_gemini_key')||'';}
 function saveGeminiKey(){
   const v=document.getElementById('gemini-key-inp').value.trim();
-  localStorage.setItem('sanbo_gemini_key',v);
+  state.geminiKey=v;save();
   document.getElementById('gemini-key-status').textContent=v?'設定済み（'+v.slice(0,10)+'...）':'クリアしました';
   document.getElementById('gemini-key-status').className='gs-status '+(v?'gs-ok':'');
   document.getElementById('gemini-key-inp').value='';
@@ -1022,9 +1022,9 @@ async function askAdvisor(sec,preset,_retry=0){
   _aiInFlight=true;
   const apiKey=getGeminiKey();
   const msgEl=document.getElementById('ai-'+sec+'-msgs');
-  if(!apiKey){msgEl.innerHTML='<div class="ai-msg-loading">APIキーが未設定です。「シート連携」タブ上部で設定してください。</div>';return;}
+  if(!apiKey){msgEl.innerHTML='<div class="ai-msg-loading">APIキーが未設定です。「シート連携」タブ上部で設定してください。</div>';_aiInFlight=false;return;}
   const inp=document.getElementById('ai-'+sec+'-inp');
-  const q=preset||inp.value.trim();if(!q)return;inp.value='';
+  const q=preset||inp.value.trim();if(!q){_aiInFlight=false;return;}inp.value='';
   if(!aiHistories[sec])aiHistories[sec]=[];
   aiHistories[sec].push({role:'user',parts:[{text:q}]});
   if(aiHistories[sec].length>20)aiHistories[sec]=aiHistories[sec].slice(-20);
@@ -1032,7 +1032,7 @@ async function askAdvisor(sec,preset,_retry=0){
   const loadDiv=document.createElement('div');loadDiv.className='ai-msg-loading';loadDiv.textContent='考え中...';msgEl.appendChild(loadDiv);
   userDiv.scrollIntoView({behavior:'smooth',block:'start'});
   try{
-    const res=await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash-lite:generateContent?key=${apiKey}`,{
+    const res=await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKey}`,{
       method:'POST',headers:{'Content-Type':'application/json'},
       body:JSON.stringify({
         system_instruction:{parts:[{text:aiSysPrompts[sec]+'\n\n'+buildContext(sec)}]},
@@ -1124,7 +1124,10 @@ function renderCalBar(){
 function renderAll(){renderHome();renderSky();renderKifune();renderMkt();renderResearch();renderOrg();renderCal();renderReminders();renderGS();renderOrders();renderIdeas();renderOrderStats();renderCalBar();}
 if(Notification.permission==='granted')document.getElementById('notif-perm').textContent='許可済み';
 else if(Notification.permission==='denied')document.getElementById('notif-perm').textContent='拒否済み';
-load();renderAll();
+load();
+// 旧キー(sanbo_gemini_key)からstateへ移行
+{const _old=localStorage.getItem('sanbo_gemini_key');if(_old&&!state.geminiKey){state.geminiKey=_old;save();localStorage.removeItem('sanbo_gemini_key');}}
+renderAll();
 updateDatalist('dl-customers',state.knownCustomers||[]);
 const _gk=getGeminiKey();
 document.getElementById('gemini-key-status').textContent=_gk?'設定済み（'+_gk.slice(0,10)+'...）':'未設定';
