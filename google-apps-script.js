@@ -60,11 +60,11 @@ function loadData() {
 function getCalendarEvents(calId) {
   try {
     const now = new Date();
-    const threeMonthsLater = new Date();
-    threeMonthsLater.setMonth(threeMonthsLater.getMonth() + 3);
+    const oneYearLater = new Date();
+    oneYearLater.setFullYear(oneYearLater.getFullYear() + 1);
 
     const cal = CalendarApp.getCalendarById(calId) || CalendarApp.getDefaultCalendar();
-    const gcalEvents = cal.getEvents(now, threeMonthsLater);
+    const gcalEvents = cal.getEvents(now, oneYearLater);
 
     const events = gcalEvents.map(ev => ({
       title: ev.getTitle(),

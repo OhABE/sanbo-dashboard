@@ -680,7 +680,7 @@ function renderCal(){
   const total=first+days;const rem2=total%7===0?0:7-(total%7);
   for(let i=1;i<=rem2;i++){const d=document.createElement('div');d.className='cal-day other';d.innerHTML=`<div class="cal-num">${i}</div>`;grid.appendChild(d);}
   const todayStr=localDateStr(now);
-  const up=allEvents().filter(e=>e.date>=todayStr).slice(0,6);
+  const up=allEvents().filter(e=>e.date>=todayStr).slice(0,30);
   const ul=document.getElementById('upcoming-list');ul.innerHTML='';
   if(!up.length){ul.innerHTML='<div style="font-size:12px;color:var(--text3);font-style:italic;padding:8px 0">予定がありません</div>';return;}
   up.forEach(e=>{const d=document.createElement('div');d.className='upc-item';d.innerHTML=`<span class="pipe-stage ${secColorClass[e.sec]||'ev-sky'}" style="font-size:10px">${e.date}</span><span style="flex:1;font-size:13px;color:var(--text)">${e.title}</span>${e.sec!=='gcal'?`<span class="del-btn" onclick="delEvent('${e.date}','${e.title}')">×</span>`:''}`;ul.appendChild(d);});
